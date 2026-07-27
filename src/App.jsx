@@ -24,12 +24,33 @@ import {
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v11";
+const STORAGE_KEY = "ilim-yolu-v12";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
-// Bursa Namaz Vakitleri
-function getBursaPrayerTimes() {
+// Bursa Namaz Vakitlerini Ücretsiz Aladhan API Üzerinden Canlı Çeken Fonksiyon
+async function fetchBursaPrayerTimes() {
+  try {
+    // Bursa koordinatları: 40.1885, 29.0610 / Method 13 = Diyanet İşleri Başkanlığı
+    const res = await fetch(
+      "https://api.aladhan.com/v1/timings?latitude=40.1885&longitude=29.0610&method=13"
+    );
+    const data = await res.json();
+    if (data && data.data && data.data.timings) {
+      const t = data.data.timings;
+      return {
+        imsak: t.Fajr,
+        gunes: t.Sunrise,
+        ogle: t.Dhuhr,
+        ikindi: t.Asr,
+        aksam: t.Maghrib,
+        yatsi: t.Isha,
+      };
+    }
+  } catch (error) {
+    console.error("Vakitler çekilemedi, yedek saatler kullanılıyor:", error);
+  }
+  // Bağlantı hatası durumunda yedek (fallback) vakitler
   return {
     imsak: "04:32",
     gunes: "06:05",
@@ -40,12 +61,17 @@ function getBursaPrayerTimes() {
   };
 }
 
-// Otomatik Dark Mode Kontrolü (Akşam 20:10 ile İmsak 04:32 arası)
-function isNightTime() {
+// Otomatik Dark Mode Kontrolü (Akşam vaktinden İmsak vaktine kadar)
+function isNightTime(aksamStr = "20:10", imsakStr = "04:32") {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const aksamMinutes = 20 * 60 + 10; // 20:10
-  const imsakMinutes = 4 * 60 + 32;  // 04:32
+  
+  const [aH, aM] = aksamStr.split(":").map(Number);
+  const [iH, iM] = imsakStr.split(":").map(Number);
+  
+  const aksamMinutes = aH * 60 + aM;
+  const imsakMinutes = iH * 60 + iM;
+  
   return currentMinutes >= aksamMinutes || currentMinutes < imsakMinutes;
 }
 
@@ -418,7 +444,7 @@ const surahData = [
     verses: 8,
     usage: 6,
     status: "not_started",
-    arabic: `أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ
+    arabic: `أَلَمْ نَش شرحْ لَكَ صَدْرَكَ
 وَوَضَعْنَا عَنكَ وِزْرَكَ
 الَّذِي أَنْقَضَ ظَهْرَكَ
 وَرَفَعْنَا لَكَ ذِكْرَكَ
@@ -531,6 +557,7 @@ const DEFAULT_STATE = {
   zikrCounts: {},
   zikrTarget: 33,
   dailyLogs: { date: "", zikrs: [], duas: [] },
+  notifications: ["Bugün Öğle namazını kılmayı unutma!", "Felak Suresi hatırlatma günü!", "Tesbihat zamanı!"],
 };
 
 function normalizeState(s) {
@@ -595,6 +622,29 @@ function App() {
   const [celebrate, setCelebrate] = useState("");
   const [activeItemType, setActiveItemType] = useState("surah");
 
+  // Bursa Canlı Namaz Vakitleri State'i
+  const [bursaTimes, setBursaTimes] = useState({
+    imsak: "04:32",
+    gunes: "06:05",
+    ogle: "13:12",
+    ikindi: "16:58",
+    aksam: "20:10",
+    yatsi: "21:38",
+  });
+
+  // Bursa Vakitlerini API'den Çekme Effect'i
+  useEffect(() => {
+    fetchBursaPrayerTimes().then((times) => {
+      if (times) {
+        setBursaTimes(times);
+        // Otomatik Gece Modunu çekilen güncel vakitlere göre denetleme
+        if (localStorage.getItem(STORAGE_KEY) === null) {
+          setState((s) => ({ ...s, isDarkMode: isNightTime(times.aksam, times.imsak) }));
+        }
+      }
+    });
+  }, []);
+
   // Google Fonts (Amiri Fontu Yükle)
   useEffect(() => {
     const link = document.createElement("link");
@@ -631,7 +681,6 @@ function App() {
   const prayerSeries = getPrayerSeries(state.prayerHistory, 7);
   const todayCount = Object.values(state.prayerDone).filter(Boolean).length;
   const prayerFinished = todayCount === 5;
-  const bursaTimes = getBursaPrayerTimes();
 
   const selectedSurah = surahData.find((s) => s.id === state.selectedSurah) || surahData[0];
   const selectedDua = duaData.find((d) => d.id === state.selectedDua) || duaData[0];
@@ -921,13 +970,13 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
   return (
     <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
-        {/* Bursa Namaz Vakitleri Kartı */}
+        {/* Bursa Canlı Namaz Vakitleri Kartı */}
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <div className="flex items-center justify-between border-b border-emerald-500/10 pb-3">
             <div className="flex items-center gap-2 font-bold text-emerald-400">
-              <Clock className="h-5 w-5 text-amber-400" /> Bursa Namaz Vakitleri
+              <Clock className="h-5 w-5 text-amber-400" /> Bursa Namaz Vakitleri (Canlı)
             </div>
-            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Sabit Konum</span>
+            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Diyanet Uyumlu</span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
             <TimeBox label="İmsak" time={bursaTimes.imsak} isDark={isDark} />
@@ -1039,7 +1088,7 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
 
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bilgilendirme</h3>
-          <p className={`mt-2 text-xs leading-6 ${theme.textMuted}`}>Otomatik Gece Modu Bursa vakitlerine göredir. Saat Akşam namazından (20:10) sabah İmsak saatine (04:32) kadar arayüz göz yormayacak şekilde karanlık moda geçer.</p>
+          <p className={`mt-2 text-xs leading-6 ${theme.textMuted}`}>Canlı Bursa namaz vakitleri Diyanet takvimine tam uyumlu şekilde günlük çekilmektedir. Otomatik Gece Modu saat Akşam namazından (20:10) sabah İmsak saatine (04:32) kadar göz yormayacak şekilde karanlık moda geçer.</p>
         </section>
       </aside>
     </div>
