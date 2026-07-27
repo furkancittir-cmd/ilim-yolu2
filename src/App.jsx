@@ -24,14 +24,13 @@ import {
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v12";
+const STORAGE_KEY = "ilim-yolu-v13";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
 // Bursa Namaz Vakitlerini Ücretsiz Aladhan API Üzerinden Canlı Çeken Fonksiyon
 async function fetchBursaPrayerTimes() {
   try {
-    // Bursa koordinatları: 40.1885, 29.0610 / Method 13 = Diyanet İşleri Başkanlığı
     const res = await fetch(
       "https://api.aladhan.com/v1/timings?latitude=40.1885&longitude=29.0610&method=13"
     );
@@ -50,7 +49,6 @@ async function fetchBursaPrayerTimes() {
   } catch (error) {
     console.error("Vakitler çekilemedi, yedek saatler kullanılıyor:", error);
   }
-  // Bağlantı hatası durumunda yedek (fallback) vakitler
   return {
     imsak: "04:32",
     gunes: "06:05",
@@ -61,17 +59,14 @@ async function fetchBursaPrayerTimes() {
   };
 }
 
-// Otomatik Dark Mode Kontrolü (Akşam vaktinden İmsak vaktine kadar)
+// Otomatik Dark Mode Kontrolü
 function isNightTime(aksamStr = "20:10", imsakStr = "04:32") {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  
   const [aH, aM] = aksamStr.split(":").map(Number);
   const [iH, iM] = imsakStr.split(":").map(Number);
-  
   const aksamMinutes = aH * 60 + aM;
   const imsakMinutes = iH * 60 + iM;
-  
   return currentMinutes >= aksamMinutes || currentMinutes < imsakMinutes;
 }
 
@@ -632,12 +627,11 @@ function App() {
     yatsi: "21:38",
   });
 
-  // Bursa Vakitlerini API'den Çekme Effect'i
+  // Bursa Vakitlerini API'den Çekme
   useEffect(() => {
     fetchBursaPrayerTimes().then((times) => {
       if (times) {
         setBursaTimes(times);
-        // Otomatik Gece Modunu çekilen güncel vakitlere göre denetleme
         if (localStorage.getItem(STORAGE_KEY) === null) {
           setState((s) => ({ ...s, isDarkMode: isNightTime(times.aksam, times.imsak) }));
         }
@@ -887,9 +881,10 @@ function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans ${themeClasses.bg}`}>
       <div className="mx-auto max-w-[1400px] p-4 pb-28 lg:p-6">
+        {/* Sadeleştirilmiş Ana Sayfa / Profil Üst Header */}
         {(state.selectedTab === "home" || state.selectedTab === "profil") && (
           <header className={`mb-4 rounded-[2rem] border p-4 transition-colors ${themeClasses.cardBg} ${themeClasses.accentGlow}`}>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-500">
@@ -900,13 +895,11 @@ function App() {
                   </button>
                 </div>
                 <h2 className={`mt-1 text-2xl font-black ${themeClasses.textHeading}`}>Selam, {state.username || "misafir"}</h2>
-                <p className={`text-sm ${themeClasses.textMuted}`}>Bugün {todayCount}/5 namaz · Streak {prayerStreak} Gün</p>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <MiniStat label="XP" value={state.xp} icon={Zap} isDark={isDark} />
-                <MiniStat label="Seviye" value={state.level} icon={Crown} isDark={isDark} />
-                <MiniStat label="Gems" value={state.gems} icon={Gem} isDark={isDark} />
-                <MiniStat label="Kaza" value={state.missedPrayers} icon={AlertTriangle} isDark={isDark} />
+              <div className="text-right">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-xs font-bold text-amber-400">
+                  🔥 {prayerStreak} Gün Streak
+                </span>
               </div>
             </div>
           </header>
@@ -929,7 +922,6 @@ function App() {
         {state.selectedTab === "profil" && <ProfileView state={state} prayerStreak={prayerStreak} prayerSeries={prayerSeries} logout={logout} theme={themeClasses} isDark={isDark} />}
       </div>
 
-      {/* Yenilenmiş Alt Menü */}
       <nav className={`fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-lg transition-colors ${isDark ? "bg-[#0b1311]/90 border-emerald-900/50" : "bg-white/90 border-emerald-100"}`}>
         <div className="mx-auto grid max-w-[1400px] grid-cols-6 gap-1 p-2">
           {[
@@ -951,6 +943,73 @@ function App() {
   );
 }
 
+// Canlı Ezan Vaktine Kalan Süreyi Hesaplayan Bileşen
+function PrayerCountdown({ bursaTimes, isDark }) {
+  const [timeLeft, setTimeLeft] = useState({ nextName: "", hours: "00", minutes: "00", seconds: "00" });
+
+  useEffect(() => {
+    const calculateCountdown = () => {
+      const now = new Date();
+      const list = [
+        { name: "İmsak", time: bursaTimes.imsak },
+        { name: "Güneş", time: bursaTimes.gunes },
+        { name: "Öğle", time: bursaTimes.ogle },
+        { name: "İkindi", time: bursaTimes.ikindi },
+        { name: "Akşam", time: bursaTimes.aksam },
+        { name: "Yatsı", time: bursaTimes.yatsi },
+      ];
+
+      let next = null;
+
+      for (let p of list) {
+        const [h, m] = p.time.split(":").map(Number);
+        const pDate = new Date();
+        pDate.setHours(h, m, 0, 0);
+
+        if (pDate > now) {
+          next = { name: p.name, date: pDate };
+          break;
+        }
+      }
+
+      // Yarının İmsak vakti
+      if (!next) {
+        const [h, m] = bursaTimes.imsak.split(":").map(Number);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(h, m, 0, 0);
+        next = { name: "İmsak (Yarın)", date: tomorrow };
+      }
+
+      const diff = Math.max(0, Math.floor((next.date - now) / 1000));
+      const hours = String(Math.floor(diff / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+      const seconds = String(diff % 60).padStart(2, "0");
+
+      setTimeLeft({ nextName: next.name, hours, minutes, seconds });
+    };
+
+    calculateCountdown();
+    const interval = setInterval(calculateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [bursaTimes]);
+
+  return (
+    <div className={`mt-3 flex items-center justify-between rounded-2xl border p-3.5 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-emerald-50/60 border-emerald-100"}`}>
+      <div className="flex items-center gap-2">
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span className="text-xs font-bold text-amber-400">Sonraki Vakit: <span className={isDark ? "text-emerald-100" : "text-emerald-950"}>{timeLeft.nextName}</span></span>
+      </div>
+      <div className="font-mono text-sm font-black tracking-wider text-emerald-400">
+        {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
+      </div>
+    </div>
+  );
+}
+
 function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak, prayerSeries, markPrayer, markDuaRead, setState, theme, isDark }) {
   const prayerCards = [
     { id: "sabah", tr: "Sabah", en: "Fajr" },
@@ -963,20 +1022,19 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
   const todayZikrs = isToday && state.dailyLogs?.zikrs?.length ? state.dailyLogs.zikrs.join(" • ") : "Henüz kayıt yok";
   const todayDuas = isToday && state.dailyLogs?.duas?.length ? state.dailyLogs.duas.join(" • ") : "Henüz kayıt yok";
 
-  // Dairesel İlerleme Çubuğu İçin Hesaplama
   const percentage = (todayCount / 5) * 100;
   const strokeDashoffset = 251.2 - (251.2 * percentage) / 100;
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
-        {/* Bursa Canlı Namaz Vakitleri Kartı */}
+        {/* 1. SIRA: Bursa Namaz Vakitleri & Canlı Geri Sayım Sayacı */}
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <div className="flex items-center justify-between border-b border-emerald-500/10 pb-3">
             <div className="flex items-center gap-2 font-bold text-emerald-400">
-              <Clock className="h-5 w-5 text-amber-400" /> Bursa Namaz Vakitleri (Canlı)
+              <Clock className="h-5 w-5 text-amber-400" /> Bursa Namaz Vakitleri
             </div>
-            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Diyanet Uyumlu</span>
+            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Diyanet</span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
             <TimeBox label="İmsak" time={bursaTimes.imsak} isDark={isDark} />
@@ -986,52 +1044,16 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
             <TimeBox label="Akşam" time={bursaTimes.aksam} isDark={isDark} />
             <TimeBox label="Yatsı" time={bursaTimes.yatsi} isDark={isDark} />
           </div>
+
+          {/* Ezan Vaktine Kalan Süre Sayacı */}
+          <PrayerCountdown bursaTimes={bursaTimes} isDark={isDark} />
         </section>
 
-        {/* Dairesel Grafikli Günün Özeti */}
-        <section className={`rounded-[2rem] border p-5 transition ${theme.cardBg}`}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {/* Circular Progress Bar */}
-              <div className="relative flex items-center justify-center h-24 w-24 flex-shrink-0">
-                <svg className="h-24 w-24 transform -rotate-90">
-                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" className={isDark ? "text-emerald-950" : "text-emerald-100"} fill="transparent" />
-                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" className="text-emerald-500 transition-all duration-700 ease-out" strokeDasharray="251.2" strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-xl font-black text-amber-400">{todayCount}/5</span>
-                  <span className="text-[9px] uppercase font-bold text-emerald-400">Namaz</span>
-                </div>
-              </div>
-              <div>
-                <h3 className={`text-xl font-bold ${theme.textHeading}`}>Bugünün Özeti</h3>
-                <p className={`text-sm ${theme.textMuted}`}>Bugün okudukların ve ibadet hedeflerin.</p>
-                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 text-xs font-bold text-amber-400">
-                  🔥 Streak: {prayerStreak} Gün
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            <div className={`rounded-2xl border p-3.5 text-xs leading-6 ${theme.subCardBg}`}>
-              <div className="font-bold text-amber-400">Bugünkü Zikirler</div>
-              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayZikrs}</div>
-            </div>
-            <div className={`rounded-2xl border p-3.5 text-xs leading-6 ${theme.subCardBg}`}>
-              <div className="font-bold text-amber-400">Bugünkü Dualar</div>
-              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayDuas}</div>
-              <button onClick={() => markDuaRead(state.selectedDua)} className="mt-2 rounded-xl bg-emerald-700 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-600 transition active:scale-95">
-                Bu Duayı Okudum
-              </button>
-            </div>
-          </div>
-        </section>
-
+        {/* 2. SIRA: Bugün Kılınan Namazların İşaretleme Çizelgesi */}
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <div className="flex items-center justify-between gap-3 mb-3">
-            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Vakit Namazları</h3>
-            <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Bugün {todayCount}/5</div>
+            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bugün Kılınan Namazlar</h3>
+            <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Tamamlanan {todayCount}/5</div>
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             {prayerCards.map((p) => {
@@ -1052,9 +1074,45 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
           </div>
         </section>
 
+        {/* 3. SIRA (EN ALT): Bugünün Özeti ve Bugün Ne Yapayım */}
+        <section className={`rounded-[2rem] border p-5 transition ${theme.cardBg}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex items-center justify-center h-20 w-20 flex-shrink-0">
+                <svg className="h-20 w-20 transform -rotate-90">
+                  <circle cx="40" cy="40" r="34" stroke="currentColor" strokeWidth="7" className={isDark ? "text-emerald-950" : "text-emerald-100"} fill="transparent" />
+                  <circle cx="40" cy="40" r="34" stroke="currentColor" strokeWidth="7" className="text-emerald-500 transition-all duration-700 ease-out" strokeDasharray="213.6" strokeDashoffset={213.6 - (213.6 * percentage) / 100} strokeLinecap="round" fill="transparent" />
+                </svg>
+                <div className="absolute flex flex-col items-center justify-center">
+                  <span className="text-lg font-black text-amber-400">{todayCount}/5</span>
+                  <span className="text-[8px] uppercase font-bold text-emerald-400">Namaz</span>
+                </div>
+              </div>
+              <div>
+                <h3 className={`text-xl font-bold ${theme.textHeading}`}>Bugünün Özeti</h3>
+                <p className={`text-xs ${theme.textMuted}`}>Bugün okuduğunuz zikirler ve dualar.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className={`rounded-2xl border p-3 text-xs leading-6 ${theme.subCardBg}`}>
+              <div className="font-bold text-amber-400">Bugünkü Zikirler</div>
+              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayZikrs}</div>
+            </div>
+            <div className={`rounded-2xl border p-3 text-xs leading-6 ${theme.subCardBg}`}>
+              <div className="font-bold text-amber-400">Bugünkü Dualar</div>
+              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayDuas}</div>
+              <button onClick={() => markDuaRead(state.selectedDua)} className="mt-2 rounded-xl bg-emerald-700 px-3 py-1 text-[10px] font-bold text-white hover:bg-emerald-600 transition active:scale-95">
+                Bu Duayı Okudum
+              </button>
+            </div>
+          </div>
+        </section>
+
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <div className="flex items-center justify-between gap-3 mb-3">
-            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bugün Ne Yapayım?</h3>
+            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bugün Ne Yapmalıyım?</h3>
             <div className={`rounded-full px-3 py-1 text-xs font-semibold ${prayerFinished ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"}`}>{prayerFinished ? "Tamamlandı" : `Eksik ${5 - todayCount}`}</div>
           </div>
           <div className="grid gap-2 md:grid-cols-2">
@@ -1088,7 +1146,7 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
 
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bilgilendirme</h3>
-          <p className={`mt-2 text-xs leading-6 ${theme.textMuted}`}>Canlı Bursa namaz vakitleri Diyanet takvimine tam uyumlu şekilde günlük çekilmektedir. Otomatik Gece Modu saat Akşam namazından (20:10) sabah İmsak saatine (04:32) kadar göz yormayacak şekilde karanlık moda geçer.</p>
+          <p className={`mt-2 text-xs leading-6 ${theme.textMuted}`}>Canlı Bursa namaz vakitleri Diyanet takvimine tam uyumlu şekilde çekilmektedir. Bir sonraki vakte kalan süre geri sayım aracılığıyla canlı olarak sunulur.</p>
         </section>
       </aside>
     </div>
@@ -1165,7 +1223,6 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
         <div className="mt-4 rounded-3xl p-3 sm:p-4 bg-emerald-500/5 border border-emerald-500/10">
           <div className="grid gap-4 lg:grid-cols-[0.55fr_0.45fr]">
-            {/* Özel Amiri Fontlu Arapça Metin Kartı */}
             <div className={`rounded-3xl border p-5 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">Arapça Metin</div>
               <div className="mt-3 text-xl sm:text-2xl leading-relaxed text-right font-serif tracking-wide select-none" dir="rtl" style={{ fontFamily: "'Amiri', serif", lineHeight: 2.4 }}>
@@ -1309,7 +1366,6 @@ function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZi
           <div className={`mt-1 text-center text-2xl font-black ${theme.textHeading}`}>{selectedZikr.name}</div>
           <div className={`mt-0.5 text-xs ${theme.textMuted}`}>{selectedZikr.translit}</div>
 
-          {/* Elastik Yaylanan Zikirmatik Butonu */}
           <button onClick={addZikr} className="mt-6 flex h-64 w-64 items-center justify-center rounded-full border-8 border-emerald-500/20 bg-emerald-700 text-white shadow-2xl shadow-emerald-900/50 transition-all duration-150 active:scale-90 sm:h-80 sm:w-80 hover:bg-emerald-600">
             <div className="text-center select-none">
               <div className="text-[10px] font-bold uppercase tracking-[0.35em] text-emerald-200">Dokun</div>
@@ -1412,6 +1468,7 @@ function GameView({ surah, surahList, setSelectedSurah, addXp, theme, isDark }) 
   );
 }
 
+// XP, Seviye, Gems Detaylarının Taşındığı Yenilenmiş Profil Sayfası
 function ProfileView({ state, prayerStreak, prayerSeries, logout, theme, isDark }) {
   const max = Math.max(5, ...prayerSeries.map((b) => b.count));
   const initials = state.username ? state.username.slice(0, 2).toUpperCase() : "U";
@@ -1426,14 +1483,23 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout, theme, isDark 
           </div>
           <div>
             <h3 className={`text-lg font-bold ${theme.textHeading}`}>{state.username}</h3>
-            <p className={`text-xs ${theme.textMuted}`}>Profil ve İlerleme</p>
+            <p className={`text-xs ${theme.textMuted}`}>Kullanıcı Profili</p>
           </div>
         </div>
+
+        {/* Ana Sayfadan Taşınan XP, Seviye, Gems İstatistiki Kartları */}
+        <div className="mb-4 grid grid-cols-2 gap-2">
+          <MiniStat label="XP" value={state.xp} icon={Zap} isDark={isDark} />
+          <MiniStat label="Seviye" value={state.level} icon={Crown} isDark={isDark} />
+          <MiniStat label="Gems" value={state.gems} icon={Gem} isDark={isDark} />
+          <MiniStat label="Kaza" value={state.missedPrayers} icon={AlertTriangle} isDark={isDark} />
+        </div>
+
         <div className="space-y-2.5">
           <ProfileLine label="Toplam XP" value={state.xp} theme={theme} />
-          <ProfileLine label="Seviye" value={state.level} theme={theme} />
+          <ProfileLine label="Mevcut Seviye" value={state.level} theme={theme} />
           <ProfileLine label="Namaz Streak" value={`${prayerStreak} Gün`} theme={theme} />
-          <ProfileLine label="Gems" value={state.gems} theme={theme} />
+          <ProfileLine label="Toplam Gems" value={state.gems} theme={theme} />
           <ProfileLine label="Toplam Çekilen Zikir" value={totalZikrs} theme={theme} />
         </div>
         <div className="mt-6">
