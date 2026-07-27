@@ -46,6 +46,109 @@ const surahData = [
     meaning: `Rahmân ve Rahîm olan Allah’ın adıyla. Hamd, âlemlerin Rabbi Allah’a mahsustur. O, Rahmân’dır, Rahîm’dir. Din gününün sahibidir. Ancak Sana ibadet eder ve ancak Senden yardım dileriz. Bizi dosdoğru yola ilet. Kendilerine nimet verdiklerinin yoluna; gazaba uğrayanların ve sapmışların yoluna değil.`,
   },
   {
+    id: "fil",
+    name: "Fil Suresi",
+    arabicTitle: "الفيل",
+    verses: 5,
+    usage: 8,
+    status: "in_progress",
+    arabic: `أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ
+أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ
+وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ
+تَرْمِيهِمْ بِحِجَارَةٍ مِنْ سِجِّيلٍ
+فَجَعَلَهُمْ كَعَصْفٍ مَأْكُولٍ`,
+    translit: `Elem tera keyfe feale rabbüke bi ashâbil fîl. Elem yec'al keydehum fî tedlîl. Ve ersale aleyhim tayran ebâbîl. Termîhim bi hicâratin min siccîl. Fe cealehum ke'asfin me'kûl.`,
+    meaning: `Rabbinin fil sahiplerine nasıl davrandığını görmedin mi? Onların tuzaklarını boşa çıkarmadı mı? Üzerlerine sürü sürü kuşlar gönderdi. Onları pişmiş çamurdan taşlarla vuruyorlardı. Böylece onları yenilmiş ekin yaprağı gibi kıldı.`,
+  },
+  {
+    id: "kureys",
+    name: "Kureyş Suresi",
+    arabicTitle: "قريش",
+    verses: 4,
+    usage: 8,
+    status: "memorized",
+    arabic: `لِإِيلَافِ قُرَيْشٍ
+إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ
+فَلْيَعْبُدُوا رَبَّ هٰذَا الْبَيْتِ
+الَّذِي أَطْعَمَهُمْ مِنْ جُوعٍ وَآمَنَهُمْ مِنْ خَوْفٍ`,
+    translit: `Li îlâfi kureyş. Îlâfihim rihleteş-şitâi ve's-sayf. Felya'budû rabbe hâzel beyt. Ellezî et'amahum min cû'in ve âmenehum min havf.`,
+    meaning: `Kureyş’in yaz ve kış yolculuklarına alışması sebebiyle. Öyleyse onlar bu evin Rabbine kulluk etsinler. O Rab ki onları açlıktan doyurdu ve korkudan emin kıldı.`,
+  },
+  {
+    id: "maun",
+    name: "Maûn Suresi",
+    arabicTitle: "الماعون",
+    verses: 7,
+    usage: 7,
+    status: "not_started",
+    arabic: `أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ
+فَذٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ
+وَلَا يَحُضُّ عَلَى طَعَامِ الْمِسْكِينِ
+فَوَيْلٌ لِلْمُصَلِّينَ
+الَّذِينَ هُمْ عَنْ صَلَاتِهِمْ سَاهُونَ
+الَّذِينَ هُمْ يُرَاءُونَ
+وَيَمْنَعُونَ الْمَاعُونَ`,
+    translit: `Eraeytellezî yukezzibu bid-dîn. Fe zâlikellezî yedu'ul yetîm. Ve lâ yahuddu alâ ta'âmil miskîn. Fe veylün lil musallîn. Ellezîne hum an salâtihim sâhûn. Ellezîne hum yürâûn. Ve yemna'ûnel mâûn.`,
+    meaning: `Dini yalan sayanı gördün mü? İşte o, yetimi itip kakan; yoksulu doyurmaya teşvik etmeyen kişidir. Yazıklar olsun o namaz kılanlara ki onlar namazlarını ciddiye almazlar; gösteriş yaparlar; ufak yardımı bile esirgerler.`,
+  },
+  {
+    id: "kevser",
+    name: "Kevser Suresi",
+    arabicTitle: "الكوثر",
+    verses: 3,
+    usage: 9,
+    status: "memorized",
+    arabic: `إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ
+فَصَلِّ لِرَبِّكَ وَانْحَرْ
+إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ`,
+    translit: `İnnâ a'taynâke'l-kevser. Fe salli lirabbike venhar. İnne şâni'eke huve'l-ebter.`,
+    meaning: `Biz sana Kevser’i verdik. O hâlde Rabbin için namaz kıl ve kurban kes. Asıl sonu kesik olan, sana kin tutandır.`,
+  },
+  {
+    id: "kafirun",
+    name: "Kâfirûn Suresi",
+    arabicTitle: "الكافرون",
+    verses: 6,
+    usage: 8,
+    status: "in_progress",
+    arabic: `قُلْ يَا أَيُّهَا الْكَافِرُونَ
+لَا أَعْبُدُ مَا تَعْبُدُونَ
+وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ
+وَلَا أَنَا عَابِدٌ مَا عَبَدْتُمْ
+وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ
+لَكُمْ دِينُكُمْ وَلِيَ دِينِ`,
+    translit: `Kul yâ eyyühel kâfirûn. Lâ a'budu mâ ta'budûn. Ve lâ entüm âbidûne mâ a'bud. Ve lâ ene âbidun mâ abedtüm. Ve lâ entüm âbidûne mâ a'bud. Leküm dînüküm ve liye dîn.`,
+    meaning: `De ki: Ey kâfirler! Sizin taptığınıza ben tapmam. Siz de benim tapacağıma tapmazsınız. Ben sizin taptığınıza tapacak değilim. Siz de benim tapacağıma tapacak değilsiniz. Sizin dininiz size, benim dinim bana.`,
+  },
+  {
+    id: "nasr",
+    name: "Nasr Suresi",
+    arabicTitle: "النصر",
+    verses: 3,
+    usage: 8,
+    status: "memorized",
+    arabic: `إِذَا جَاءَ نَصْرُ اللّٰهِ وَالْفَتْحُ
+وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللّٰهِ أَفْوَاجًا
+فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ إِنَّهُ كَانَ تَوَّابًا`,
+    translit: `İzâ câe nasrullâhi vel feth. Ve raeyten nâse yedhulûne fî dînillâhi efvâcâ. Fe sebbih bihamdi rabbike vestagfirh. İnnehû kâne tevvâbâ.`,
+    meaning: `Allah’ın yardımı ve fetih geldiği zaman; insanların Allah’ın dinine gruplar hâlinde girdiklerini gördüğünde, Rabbini hamd ile tesbih et ve O’ndan bağışlanma dile. Şüphesiz O, tevbeleri çok kabul edendir.`,
+  },
+  {
+    id: "tebbet",
+    name: "Tebbet / Leheb Suresi",
+    arabicTitle: "المسد",
+    verses: 5,
+    usage: 7,
+    status: "not_started",
+    arabic: `تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ
+مَا أَغْنَىٰ عَنْهُ مَالُهُ وَمَا كَسَبَ
+سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ
+وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ
+فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ`,
+    translit: `Tebbet yedâ Ebî Lehebin ve tabb. Mâ ağnâ anhu mâluhû ve mâ keseb. Seyaslâ nâran zâte leheb. Vemraetühû hammâletel hatab. Fî cîdihâ hablün min mesed.`,
+    meaning: `Ebu Leheb’in elleri kurusun! Kendisi de kurudu. Malı ve kazandığı ona fayda vermedi. O, alevli bir ateşe girecektir. Karısı da odun taşıyacaktır. Boynunda bükülmüş ipten bir halat olacak.`,
+  },
+  {
     id: "ihlas",
     name: "İhlâs Suresi",
     arabicTitle: "الإخلاص",
@@ -91,23 +194,251 @@ const surahData = [
     meaning: `De ki: İnsanların Rabbine, insanların Melikine, insanların ilâhına sığınırım. Sinsice vesvese veren şeytanın şerrinden; insanların göğüslerine vesvese veren; cinlerden ve insanlardan olan vesvesecinin şerrinden.`,
   },
   {
-    id: "ayetelkursi",
-    name: "Ayetel Kürsi",
-    arabicTitle: "آية الكرسي",
-    verses: 1,
-    usage: 10,
-    status: "in_progress",
-    arabic: `اللّٰهُ لَا إِلٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ
-لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ
-لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ
-مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ
-يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ
-وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ
-وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ
-وَلَا يَئُودُهُ حِفْظُهُمَا
-وَهُوَ الْعَلِيُّ الْعَظِيمُ`,
-    translit: `Allâhu lâ ilâhe illâ hüve'l-hayyü'l-kayyûm. Lâ te'huzühû sinetün ve lâ nevm. Lehû mâ fis-semâvâti ve mâ fil ard. Menzellezî yeşfeu indehû illâ bi iznih. Ya'lemü mâ beyne eydîhim ve mâ halfehum. Ve lâ yuhîtûne bi şey'in min ilmihî illâ bimâ şâe. Vesi'a kürsiyyühüs-semâvâti vel ard. Ve lâ yeûdühû hıfzuhumâ. Ve huvel aliyyül azîm.`,
-    meaning: `Allah; O’ndan başka ilâh yoktur, diridir, kayyumdur. Onu ne uyuklama tutar ne uyku. Göklerde ve yerde ne varsa O’nundur. İzni olmadan O’nun katında kim şefaat edebilir? Önlerindekini ve arkalarındakini bilir. O’nun ilminden, dilediği kadarından başka hiçbir şeyi kuşatamazlar. Kürsüsü gökleri ve yeri kaplamıştır. Onları koruyup gözetmek O’na ağır gelmez. O yücedir, büyüktür.`,
+    id: "asr",
+    name: "Asr Suresi",
+    arabicTitle: "العصر",
+    verses: 3,
+    usage: 9,
+    status: "memorized",
+    arabic: `وَالْعَصْرِ
+إِنَّ الْإِنسَانَ لَفِي خُسْرٍ
+إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ`,
+    translit: `Vel asr. İnnel insâne lefî husr. İllellezîne âmenû ve amilüs sâlihâti ve tevâsav bil hakkı ve tevâsav bis sabr.`,
+    meaning: `Asra andolsun ki insan gerçekten ziyandadır. Ancak iman edip salih amel işleyenler, hakkı tavsiye edenler ve sabrı tavsiye edenler bunun dışındadır.`,
+  },
+  {
+    id: "kadr",
+    name: "Kadr Suresi",
+    arabicTitle: "القدر",
+    verses: 5,
+    usage: 7,
+    status: "not_started",
+    arabic: `إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ
+وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ
+لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ
+تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِمْ مِّن كُلِّ أَمْرٍ
+سَلَامٌ هِيَ حَتَّىٰ مَطْلَعِ الْفَجْرِ`,
+    translit: `İnnâ enzelnâhü fî leyletil kadr. Ve mâ edrâke mâ leyletül kadr. Leyletül kadri hayrun min elfi şehr. Tenezzelül melâiketü ver-rûhu fîhâ bi izni rabbihim min külli emr. Selâmün hiye hattâ matlai'l fecr.`,
+    meaning: `Şüphesiz biz onu Kadir gecesinde indirdik. Kadir gecesinin ne olduğunu sen nasıl bileceksin? Kadir gecesi bin aydan hayırlıdır. Melekler ve Ruh, o gece Rablerinin izniyle her iş için iner. O gece tan yeri ağarıncaya kadar esenliktir.`,
+  },
+  {
+    id: "zilzal",
+    name: "Zilzal Suresi",
+    arabicTitle: "الزلزلة",
+    verses: 8,
+    usage: 5,
+    status: "not_started",
+    arabic: `إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا
+وَأَخْرَجَتِ الْأَرْضُ أَثْقَالَهَا
+وَقَالَ الْإِنسَانُ مَا لَهَا
+يَوْمَئِذٍ تُحَدِّثُ أَخْبَارَهَا
+بِأَنَّ رَبَّكَ أَوْحَىٰ لَهَا
+يَوْمَئِذٍ يَصْدُرُ النَّاسُ أَشْتَاتًا لِّيُرَوْا أَعْمَالَهُمْ
+فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ
+وَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ شَرًّا يَرَهُ`,
+    translit: `İzâ zülzilatil ardu zilzâlehâ. Ve ahrecetil ardu eksâlehâ. Ve kalel insânu mâ lehâ. Yevme izin tühaddisü ahbârehâ. Bi enne rabbeke evhâ lehâ. Yevme izin yasdürun nâsü eştâten liyürav a'mâlehüm. Fe men ya'mel miskâle zerretin hayran yerah. Ve men ya'mel miskâle zerretin şerran yerah.`,
+    meaning: `Yer sarsılıp sarsıntısını dışarı attığında, ağırlıklarını dışarı çıkardığında ve insan “Buna ne oluyor?” dediğinde yer o gün haberlerini anlatır. Çünkü Rabbin ona bunu vahyetmiştir. O gün insanlar amellerini görmek üzere dağınık gruplar hâlinde çıkacaklardır. Kim zerre kadar hayır işlerse onu görür; kim zerre kadar şer işlerse onu görür.`,
+  },
+  {
+    id: "beyyine",
+    name: "Beyyine Suresi",
+    arabicTitle: "البينة",
+    verses: 8,
+    usage: 5,
+    status: "not_started",
+    arabic: `لَمْ يَكُنِ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ مُنفَكِّينَ حَتَّىٰ تَأْتِيَهُمُ الْبَيِّنَةُ
+رَسُولٌ مِّنَ اللّٰهِ يَتْلُو صُحُفًا مُّطَهَّرَةً
+فِيهَا كُتُبٌ قَيِّمَةٌ
+وَمَا تَفَرَّقَ الَّذِينَ أُوتُوا الْكِتَابَ إِلَّا مِن بَعْدِ مَا جَاءَتْهُمُ الْبَيِّنَةُ
+وَمَا أُمِرُوا إِلَّا لِيَعْبُدُوا اللّٰهَ مُخْلِصِينَ لَهُ الدِّينَ
+حُنَفَاءَ وَيُقِيمُوا الصَّلَاةَ وَيُؤْتُوا الزَّكَاةَ وَذَٰلِكَ دِينُ الْقَيِّمَةِ
+إِنَّ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ فِي نَارِ جَهَنَّمَ
+أُولَٰئِكَ هُمْ شَرُّ الْبَرِيَّةِ`,
+    translit: `Lem yekünillezîne keferû min ehli'l kitâbi vel müşrikîne munfekkîn hattâ te'tiyehümül beyyine. Rasûlün minallâhi yetlû suhufen mutahharah. Fîhâ kütübün kayyimeh. Ve mâ teferrakellezîne ûtül kitâbe illâ min ba'di mâ câetühümül beyyine. Ve mâ ümirû illâ li ya'budûllâhe muhlisîne lehüd dîn. Hunefâe ve yukîmûs salâte ve yü'tüz zekâte ve zâlike dînül kayyimeh. İnnellezîne keferû min ehli'l kitâbi vel müşrikîne fî nâri cehenneme. Ulâike hum şerrül beriyyeh.`,
+    meaning: `Ehl-i kitaptan ve müşriklerden inkâr edenler, kendilerine açık delil gelinceye kadar ayrılıp gitmezlerdi. Allah’tan bir elçi, tertemiz sayfalar okur; içinde doğru hükümler vardır. Kendilerine kitap verilenler, ancak açık delil geldikten sonra ayrılığa düştüler. Oysa onlara sadece dini Allah için hâlis kılarak O’na kulluk etmeleri, namazı kılmaları ve zekâtı vermeleri emredilmişti. İşte dosdoğru din budur.`,
+  },
+  {
+    id: "tin",
+    name: "Tîn Suresi",
+    arabicTitle: "التين",
+    verses: 8,
+    usage: 4,
+    status: "not_started",
+    arabic: `وَالتِّينِ وَالزَّيْتُونِ
+وَطُورِ سِينِينَ
+وَهَٰذَا الْبَلَدِ الْأَمِينِ
+لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ
+ثُمَّ رَدَدْنَاهُ أَسْفَلَ سَافِلِينَ
+إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ
+فَمَا يُكَذِّبُكَ بَعْدُ بِالدِّينِ
+أَلَيْسَ اللّٰهُ بِأَحْكَمِ الْحَاكِمِينَ`,
+    translit: `Vetteyni vez zeytûn. Ve tûri sînîn. Ve hâzel beledil emîn. Lekad halaknâl insâne fî ahseni takvîm. Sümme redednâhu esfela sâfilîn. İllellezîne âmenû ve amilüs sâlihâti fe lehüm ecrun ğayru memnûn. Femâ yukezzibuke ba'dü bid dîn. Eleyse'llâhu bi ahkemil hâkimîn.`,
+    meaning: `İncire ve zeytine, Sina Dağı’na, bu emin şehre andolsun ki insanı en güzel biçimde yarattık; sonra onu aşağıların aşağısına çevirdik. Ancak iman edip salih amel işleyenler müstesna; onlar için kesintisiz bir mükâfat vardır. Bundan sonra seni ne din konusunda yalanlatabilir? Allah hükmedenlerin en iyisi değil midir?`,
+  },
+  {
+    id: "humeze",
+    name: "Hümeze Suresi",
+    arabicTitle: "الهمزة",
+    verses: 9,
+    usage: 4,
+    status: "not_started",
+    arabic: `وَيْلٌ لِكُلِّ هُمَزَةٍ لُّمَزَةٍ
+الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ
+يَحْسَبُ أَنَّ مَالَهُ أَخْلَدَهُ
+كَلَّا لَيُنْبَذَنَّ فِي الْحُطَمَةِ
+وَمَا أَدْرَاكَ مَا الْحُطَمَةُ
+نَارُ اللّٰهِ الْمُوقَدَةُ
+الَّتِي تَطَّلِعُ عَلَى الْأَفْئِدَةِ
+إِنَّهَا عَلَيْهِم مُّؤْصَدَةٌ
+فِي عَمَدٍ مُّمَدَّدَةٍ`,
+    translit: `Veylün likülli hümezetin lümeze. Ellezî cemea mâlen ve addedeh. Yahsebü enne mâlehu ahledeh. Kellâ leyünbezenne fil hutameh. Ve mâ edrâke mâl hutameh. Nârullâhil mûkadeh. Elle tî tattaliu alel efideh. İnnehâ aleyhim mu'sadeh. Fî amedin memeddedeh.`,
+    meaning: `İnsanları arkadan çekiştiren, kusur arayan herkesin vay hâline! O, mal biriktirip onu saydıkça sayandır. Malının kendisini ebedî kılacağını sanır. Hayır! O, Hutame’ye atılacaktır. Hutame’nin ne olduğunu sana bildiren ne? Allah’ın tutuşturulmuş ateşi! O, gönüllerin ta içine işler. Onlar üzerine kapatılmıştır, uzatılmış direkler arasında.`,
+  },
+  {
+    id: "tekasur",
+    name: "Tekâsür Suresi",
+    arabicTitle: "التكاثر",
+    verses: 8,
+    usage: 5,
+    status: "not_started",
+    arabic: `أَلْهَاكُمُ التَّكَاثُرُ
+حَتَّىٰ زُرْتُمُ الْمَقَابِرَ
+كَلَّا سَوْفَ تَعْلَمُونَ
+ثُمَّ كَلَّا سَوْفَ تَعْلَمُونَ
+كَلَّا لَوْ تَعْلَمُونَ عِلْمَ الْيَقِينِ
+لَتَرَوُنَّ الْجَحِيمَ
+ثُمَّ لَتَرَوُنَّهَا عَيْنَ الْيَقِينِ
+ثُمَّ لَتُسْأَلُنَّ يَوْمَئِذٍ عَنِ النَّعِيمِ`,
+    translit: `Elhâkümüt tekâsür. Hattâ zürtümül mekâbir. Kellâ sevfe ta'lemûn. Sümme kellâ sevfe ta'lemûn. Kellâ lev ta'lemûne ilmel yakîn. Le teravünnel cahîm. Sümme le teravünnehâ aynel yakîn. Sümme le tus'elünne yevme izin anin naîm.`,
+    meaning: `Çokluk yarışı sizi oyaladı; ta ki kabirleri ziyaret edinceye kadar. Hayır! Yakında bileceksiniz. Sonra yine hayır, yakında bileceksiniz. Keşke kesin bilgiyle bilseydiniz! Cehennemi mutlaka göreceksiniz. Sonra onu gözle görür gibi göreceksiniz. Sonra o gün nimetlerden mutlaka sorgulanacaksınız.`,
+  },
+  {
+    id: "karia",
+    name: "Kâria Suresi",
+    arabicTitle: "القارعة",
+    verses: 11,
+    usage: 4,
+    status: "not_started",
+    arabic: `الْقَارِعَةُ
+مَا الْقَارِعَةُ
+وَمَا أَدْرَاكَ مَا الْقَارِعَةُ
+يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ
+وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنفُوشِ
+فَأَمَّا مَن ثَقُلَتْ مَوَازِينُهُ
+فَهُوَ فِي عِيشَةٍ رَّاضِيَةٍ
+وَأَمَّا مَنْ خَفَّتْ مَوَازِينُهُ
+فَأُمُّهُ هَاوِيَةٌ
+وَمَا أَدْرَاكَ مَا هِيَهْ
+نَارٌ حَامِيَةٌ`,
+    translit: `El kâriah. Mâl kâriah. Ve mâ edrâke mâl kâriah. Yevme yekûnün nâsu kel ferâşil mebthûş. Ve tekûnül cibâlu kel ıhnil menfûş. Fe emmâ men sekulet mevâzînüh. Fe huve fî ışıetin râdiyeh. Ve emmâ men hafvet mevâzînüh. Fe ümmühû hâviyeh. Ve mâ edrâke mâ hiyeh. Nârün hâmiyeh.`,
+    meaning: `Kıyameti çarpan büyük felaket! Kıyametin ne olduğunu sana ne bildirdi? O gün insanlar dağılmış pervaneler gibi olur. Dağlar atılmış renkli yün gibi olur. Kimin tartıları ağır gelirse, o hoşnut bir hayat içindedir. Kimin tartıları hafif gelirse, onun varacağı yer Hâviye’dir. Hâviye’nin ne olduğunu sana ne bildirdi? Çok sıcak bir ateştir.`,
+  },
+  {
+    id: "adiyat",
+    name: "Âdiyât Suresi",
+    arabicTitle: "العاديات",
+    verses: 11,
+    usage: 4,
+    status: "not_started",
+    arabic: `وَالْعَادِيَاتِ ضَبْحًا
+فَالْمُورِيَاتِ قَدْحًا
+فَالْمُغِيرَاتِ صُبْحًا
+فَأَثَرْنَ بِهِ نَقْعًا
+فَوَسَطْنَ بِهِ جَمْعًا
+إِنَّ الْإِنسَانَ لِرَبِّهِ لَكَنُودٌ
+وَإِنَّهُ عَلَىٰ ذَٰلِكَ لَشَهِيدٌ
+وَإِنَّهُ لِحُبِّ الْخَيْرِ لَشَدِيدٌ
+أَفَلَا يَعْلَمُ إِذَا بُعْثِرَ مَا فِي الْقُبُورِ
+وَحُصِّلَ مَا فِي الصُّدُورِ
+إِنَّ رَبَّهُم بِهِمْ يَوْمَئِذٍ لَخَبِيرٌ`,
+    translit: `Vel âdiyâti dabha. Fel mûriyâti kadhha. Fel mugîrâti subha. Fe eserne bihî nak'a. Fe vesa'tne bihî cem'a. İnnel insâne lirabbihî le kanûd. Ve innehu alâ zâlike le şehîd. Ve innehu li hubbil hayri le şedîd. Efelâ ya'lemü izâ bu'sıra mâ fil kubûr. Ve hussıla mâ fis sudûr. İnne rabbahum bihim yevme izin le habîr.`,
+    meaning: `Nefes nefese koşan atlara andolsun, kıvılcım çıkaranlara, sabah baskın yapanlara, tozu dumana katanlara andolsun ki insan gerçekten Rabbine karşı çok nankördür; buna kendisi de şahittir. O, mal sevgisine de çok düşkündür. Kabirlerde olanlar çıkarılıp, gönüllerde olanlar ortaya döküldüğünde bilmeyecek mi? Şüphesiz Rableri o gün onlardan haberdardır.`,
+  },
+  {
+    id: "duha",
+    name: "Duha Suresi",
+    arabicTitle: "الضحى",
+    verses: 11,
+    usage: 6,
+    status: "not_started",
+    arabic: `وَالضُّحَى
+وَاللَّيْلِ إِذَا سَجَىٰ
+مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ
+وَلَلْآخِرَةُ خَيْرٌ لَّكَ مِنَ الْأُولَىٰ
+وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ
+أَلَمْ يَجِدْكَ يَتِيمًا فَآوَىٰ
+وَوَجَدَكَ ضَالًّا فَهَدَىٰ
+وَوَجَدَكَ عَائِلًا فَأَغْنَىٰ
+فَأَمَّا الْيَتِيمَ فَلَا تَقْهَرْ
+وَأَمَّا السَّائِلَ فَلَا تَنْهَرْ
+وَأَمَّا بِنِعْمَةِ رَبِّكَ فَحَدِّثْ`,
+    translit: `Ved duhâ. Velleyli izâ seca. Mâ veddeake rabbüke ve mâ kalâ. Ve lel âhiratu hayrun leke minel ûlâ. Ve lesevfe yu'tîke rabbüke fe terdâ. Elem yecidke yetîmen fe âvâ. Ve vecedeke dâllen fe hedâ. Ve vecedeke âilen fe ağnâ. Fe emmâl yetîme fe lâ takher. Ve emmâs sâile fe lâ tenher. Ve emmâ bi ni'meti rabbike fe haddis.`,
+    meaning: `Kuşluk vaktine andolsun; sakinleşen geceye andolsun ki Rabbin seni terk etmedi, sana darılmadı. Elbette ahiret senin için dünyadan daha hayırlıdır. Rabbin sana verecek de sen hoşnut olacaksın. Seni yetim bulup barındırmadı mı? Seni yolunu ararken doğru yola iletmedi mi? Seni muhtaç bulup zenginleştirmedi mi? O hâlde yetimi ezme, isteyeni azarlama, Rabbinin nimetini anlat.`,
+  },
+  {
+    id: "inshirah",
+    name: "İnşirah Suresi",
+    arabicTitle: "الشرح",
+    verses: 8,
+    usage: 6,
+    status: "not_started",
+    arabic: `أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ
+وَوَضَعْنَا عَنكَ وِزْرَكَ
+الَّذِي أَنْقَضَ ظَهْرَكَ
+وَرَفَعْنَا لَكَ ذِكْرَكَ
+فَإِنَّ مَعَ الْعُسْرِ يُسْرًا
+إِنَّ مَعَ الْعُسْرِ يُسْرًا
+فَإِذَا فَرَغْتَ فَانصَبْ
+وَإِلَىٰ رَبِّكَ فَارْغَبْ`,
+    translit: `Elem neşrah leke sadrak. Ve vedana anke vizrak. Ellezî enkada zahrak. Ve refa'nâ leke zikrak. Fe inne me'al usri yusrâ. İnne me'al usri yusrâ. Fe izâ feragta fensab. Ve ilâ rabbike ferğab.`,
+    meaning: `Senin göğsünü açıp genişletmedik mi? Sırtını ezen yükünü kaldırmadık mı? Senin için şöhretini yükseltmedik mi? Şüphesiz zorlukla beraber bir kolaylık vardır. Evet, gerçekten zorlukla beraber bir kolaylık vardır. O hâlde boş kaldığında yeni bir işe koyul ve yalnız Rabbine yönel.`,
+  },
+  {
+    id: "lakad",
+    name: "Alak Suresi",
+    arabicTitle: "العلق",
+    verses: 19,
+    usage: 4,
+    status: "not_started",
+    arabic: `اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ
+خَلَقَ الْإِنسَانَ مِنْ عَلَقٍ
+اقْرَأْ وَرَبُّكَ الْأَكْرَمُ
+الَّذِي عَلَّمَ بِالْقَلَمِ
+عَلَّمَ الْإِنسَانَ مَا لَمْ يَعْلَمْ
+كَلَّا إِنَّ الْإِنسَانَ لَيَطْغَىٰ
+أَنْ رَّآهُ اسْتَغْنَىٰ
+إِنَّ إِلَىٰ رَبِّكَ الرُّجْعَىٰ
+أَرَأَيْتَ الَّذِي يَنْهَىٰ
+عَبْدًا إِذَا صَلَّىٰ
+أَرَأَيْتَ إِن كَانَ عَلَى الْهُدَىٰ
+أَوْ أَمَرَ بِالتَّقْوَىٰ
+أَرَأَيْتَ إِن كَذَّبَ وَتَوَلَّىٰ
+أَلَمْ يَعْلَمْ بِأَنَّ اللّٰهَ يَرَىٰ
+كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ
+نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ
+فَلْيَدْعُ نَادِيَهُ
+سَنَدْعُ الزَّبَانِيَةَ
+كَلَّا لَا تُطِعْهُ وَاسْجُدْ وَاقْتَرِب`,
+    translit: `İkra bismi rabbikellezî halak. Halakal insâne min alak. İkra ve rabbükel ekrem. Ellezî allame bil kalem. Allamel insâne mâ lem ya'lem. Kellâ innel insâne le yattğâ. En raâhustağnâ. İnne ilâ rabbiker ruc'â. Eraeytellezî yenhâ. Abden izâ sallâ. Eraeyte in kâne alel hüdâ. Ev emera bit takvâ. Eraeyte in kezzebe ve tevellâ. Elem ya'lem bi enne'llâhe yerâ. Kellâ lein lem yentehi le nesfe'an binnâsiyeh. Nâsiyetin kâzibetin hâti'ah. Felyed'u nâdiyah. Sened'uz zebâniyah. Kellâ lâ tuti'hu vescud vakterib.`,
+    meaning: `Yaratan Rabbinin adıyla oku. İnsanı alaktan yarattı. Oku! Rabbin sonsuz kerem sahibidir. Kalemle öğreten O’dur. İnsana bilmediğini öğretti. Hayır! İnsan gerçekten azgınlık eder. Kendini yeterli görünce. Şüphesiz dönüş yalnız Rabbinedir. Görmedin mi o engelleyeni; bir kulu namaz kılarken. Ya o kul doğru yolda ise? Ya da takvayı emrediyorsa? Görmedin mi yalanlayıp yüz çevireni? Allah’ın gördüğünü bilmiyor mu? Hayır, vazgeçmezse onu perçeminden yakalayacağız; yalancı, günahkâr perçemden. O zaman topluluğunu çağırsın. Biz de zebânîleri çağıracağız. Sakın ona uyma; secde et ve yaklaş.`,
+  },
+  {
+    id: "beyyine",
+    name: "Beyyine Suresi",
+    arabicTitle: "البينة",
+    verses: 8,
+    usage: 5,
+    status: "not_started",
+    arabic: `لَمْ يَكُنِ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ مُنفَكِّينَ حَتَّىٰ تَأْتِيَهُمُ الْبَيِّنَةُ
+رَسُولٌ مِّنَ اللّٰهِ يَتْلُو صُحُفًا مُّطَهَّرَةً
+فِيهَا كُتُبٌ قَيِّمَةٌ
+وَمَا تَفَرَّقَ الَّذِينَ أُوتُوا الْكِتَابَ إِلَّا مِن بَعْدِ مَا جَاءَتْهُمُ الْبَيِّنَةُ
+وَمَا أُمِرُوا إِلَّا لِيَعْبُدُوا اللّٰهَ مُخْلِصِينَ لَهُ الدِّينَ
+حُنَفَاءَ وَيُقِيمُوا الصَّلَاةَ وَيُؤْتُوا الزَّكَاةَ وَذَٰلِكَ دِينُ الْقَيِّمَةِ
+إِنَّ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ فِي نَارِ جَهَنَّمَ
+أُولَٰئِكَ هُمْ شَرُّ الْبَرِيَّةِ`,
+    translit: `Lem yekünillezîne keferû min ehli'l kitâbi vel müşrikîne munfekkîn hattâ te'tiyehümül beyyine. Rasûlün minallâhi yetlû suhufen mutahharah. Fîhâ kütübün kayyimeh. Ve mâ teferrakellezîne ûtül kitâbe illâ min ba'di mâ câetühümül beyyine. Ve mâ ümirû illâ li ya'budûllâhe muhlisîne lehüd dîn. Hunefâe ve yukîmûs salâte ve yü'tüz zekâte ve zâlike dînül kayyimeh. İnnellezîne keferû min ehli'l kitâbi vel müşrikîne fî nâri cehenneme. Ulâike hum şerrül beriyyeh.`,
+    meaning: `Ehl-i kitaptan ve müşriklerden inkâr edenler, kendilerine açık delil gelinceye kadar ayrılıp gitmezlerdi. Allah’tan bir elçi, tertemiz sayfalar okur; içinde doğru hükümler vardır. Kendilerine kitap verilenler, ancak açık delil geldikten sonra ayrılığa düştüler. Oysa onlara sadece dini Allah için hâlis kılarak O’na kulluk etmeleri, namazı kılmaları ve zekâtı vermeleri emredilmişti. İşte dosdoğru din budur.`,
   },
   {
     id: "kunut_hanefi",
@@ -132,15 +463,18 @@ const surahData = [
     meaning: `Allah’ım! Hidayet verdiklerin arasında bana da hidayet ver. Afiyet verdiklerin arasında bana da afiyet ver. Dost edindiklerin arasında beni de dost edin. Bana verdiğin şeylerde bereket ver. Hükmettiğin şeylerin şerrinden beni koru.`,
   },
   {
-    id: "esma",
-    name: "Esmâ / Kısa Sureler",
-    arabicTitle: "Seçmeli",
-    verses: 0,
-    usage: 4,
+    id: "karia2",
+    name: "Kâria (Tekrar)",
+    arabicTitle: "القارعة",
+    verses: 11,
+    usage: 3,
     status: "not_started",
-    arabic: `—`,
-    translit: `Bu alanı daha sonra genişletebiliriz.`,
-    meaning: `Ek sureler için yer tutucu.`,
+    arabic: `الْقَارِعَةُ
+مَا الْقَارِعَةُ
+وَمَا أَدْرَاكَ مَا الْقَارِعَةُ
+...`,
+    translit: `Kısa tekrar kartı.`,
+    meaning: `Kısa tekrar kartı.`,
   },
 ];
 
