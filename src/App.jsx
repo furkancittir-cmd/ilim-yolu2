@@ -543,19 +543,6 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
 
         <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-bold text-emerald-950">Bu Gün Ne Yapayım?</h3>
-            <div className={`rounded-full px-3 py-1 text-xs font-semibold ${prayerFinished ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{prayerFinished ? "Tamamlandı" : `Eksik ${5 - todayCount}`}</div>
-          </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <QuickAction label="İhlâs Suresi" desc="Okumaya git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ihlas" }))} />
-            <QuickAction label="Ayetel Kürsi" desc="Okumaya git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ayetelkursi" }))} />
-            <QuickAction label="Seçili Zikir" desc="Zikirmatik'e git" onClick={() => setState((s) => ({ ...s, selectedTab: "zikir" }))} />
-            <QuickAction label="Ettehiyyâtü" desc="Dua sayfası" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedDua: "ettehiyyat" }))} />
-          </div>
-        </section>
-
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-emerald-950">Vakit Namazları</h3>
             <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Bugün {todayCount}/5</div>
           </div>
@@ -575,6 +562,19 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
                 </button>
               );
             })}
+          </div>
+        </section>
+
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-lg font-bold text-emerald-950">Bu Gün Ne Yapayım?</h3>
+            <div className={`rounded-full px-3 py-1 text-xs font-semibold ${prayerFinished ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{prayerFinished ? "Tamamlandı" : `Eksik ${5 - todayCount}`}</div>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            <QuickAction label="İhlâs Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ihlas" }))} />
+            <QuickAction label="Ayetel Kürsi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ayetelkursi" }))} />
+            <QuickAction label="Ettehiyyâtü oku" desc="Dua ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedDua: "ettehiyyat" }))} />
+            <QuickAction label="Zikir çek" desc="Zikirmatic'e git" onClick={() => setState((s) => ({ ...s, selectedTab: "zikir" }))} />
           </div>
         </section>
       </div>
@@ -608,7 +608,7 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
 
 function QuickAction({ label, desc, onClick }) {
   return (
-    <button onClick={onClick} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left hover:bg-white">
+    <button onClick={onClick} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left hover:bg-white active:scale-[0.99] transition">
       <div className="text-sm font-bold text-slate-900">{label}</div>
       <div className="mt-1 text-xs text-slate-500">{desc}</div>
     </button>
@@ -625,16 +625,16 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="text-xl font-bold text-emerald-950">Sureyi Oku</h3>
             <p className="text-sm text-slate-600">Okuma paneli üstte, seçim listesi altta.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex items-center gap-2 rounded-2xl border bg-slate-50 px-3 py-2 text-sm">
               <Search className="h-4 w-4" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ara" className="bg-transparent outline-none" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ara" className="min-w-0 bg-transparent outline-none" />
             </div>
             <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-2xl border bg-white px-3 py-2 text-sm outline-none">
               <option value="usage">Kullanım sıklığı</option>
@@ -644,73 +644,73 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
           </div>
         </div>
 
-        <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-4">
-          <div className="grid gap-4 lg:grid-cols-[0.32fr_0.68fr]">
-            <div className="rounded-3xl border border-slate-200 bg-white p-4 text-right">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Arapça</div>
-              <div className="mt-2 text-[12px] leading-6 text-slate-700" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedSurah.arabic}</div>
+        <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-3 sm:p-4">
+          <div className="grid gap-3 lg:grid-cols-[0.32fr_0.68fr]">
+            <div className="rounded-3xl border border-slate-200 bg-white p-3 text-right sm:p-4">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Arapça</div>
+              <div className="mt-2 text-[11px] leading-6 text-slate-700 sm:text-[12px]" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedSurah.arabic}</div>
             </div>
-            <div className="space-y-3 rounded-3xl bg-emerald-50 p-4">
-              <div className="rounded-2xl bg-white p-4">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Türkçe okunuş</div>
-                <div className="mt-2 text-base leading-8 text-slate-800">{selectedSurah.translit}</div>
+            <div className="space-y-3 rounded-3xl bg-emerald-50 p-3 sm:p-4">
+              <div className="rounded-2xl bg-white p-3 sm:p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe okunuş</div>
+                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedSurah.translit}</div>
               </div>
-              <div className="rounded-2xl bg-white p-4">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Türkçe meal</div>
-                <div className="mt-2 text-base leading-8 text-slate-800">{selectedSurah.meaning}</div>
+              <div className="rounded-2xl bg-white p-3 sm:p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe meal</div>
+                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedSurah.meaning}</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4">
+          <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Durum</div>
-                <div className="mt-1 text-sm text-slate-700">Hafızada / devam ediyor / sıfırlandı</div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Durum</div>
+                <div className="mt-1 text-xs text-slate-700 sm:text-sm">Hafızada / devam ediyor / sıfırlandı</div>
               </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
+              <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">Hafızada</button>
-              <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-2xl border px-4 py-2 text-sm font-semibold">Devam ediyor</button>
-              <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-2xl border px-4 py-2 text-sm font-semibold">Sıfırla</button>
+              <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-2xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">Hafızada</button>
+              <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Devam ediyor</button>
+              <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Sıfırla</button>
             </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-2xl bg-emerald-700 px-4 py-2 font-semibold text-white">+1 okuma</button>
+            <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">+1 okuma</button>
             <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold">{selectedSurah.id} · {progress[selectedSurah.id] || 0} kayıt</div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
         <h4 className="text-lg font-bold text-emerald-950">Suralar Seçim Listesi</h4>
         <p className="text-sm text-slate-500">Aşağıdan seç, üstteki okuma alanı değişsin.</p>
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {filteredSurahs.map((s) => {
             const count = progress[s.id] || 0;
             const st = statuses[s.id] || (count >= 33 ? "memorized" : count > 0 ? "in_progress" : "not_started");
             return (
-              <button key={s.id} onClick={() => setSelectedSurah(s.id)} className={`rounded-3xl border p-4 text-left transition ${selectedSurah.id === s.id ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
+              <button key={s.id} onClick={() => setSelectedSurah(s.id)} className={`rounded-3xl border p-3 text-left transition sm:p-4 ${selectedSurah.id === s.id ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="font-bold text-slate-900">{s.name}</div>
-                    <div className="text-xs text-slate-500">{s.arabicTitle} · {s.verses} ayet</div>
+                    <div className="text-sm font-bold text-slate-900 sm:text-base">{s.name}</div>
+                    <div className="text-[11px] text-slate-500 sm:text-xs">{s.arabicTitle} · {s.verses} ayet</div>
                   </div>
                   <StatusBadge status={st} />
                 </div>
                 <div className="mt-2 h-2 rounded-full bg-slate-200">
                   <div className="h-2 rounded-full bg-emerald-600" style={{ width: `${Math.min(100, (count / 33) * 100)}%` }} />
                 </div>
-                <div className="mt-2 text-xs text-slate-500">Bu sure: {count} okuma</div>
+                <div className="mt-2 text-[11px] text-slate-500 sm:text-xs">Bu sure: {count} okuma</div>
               </button>
             );
           })}
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
         <h4 className="text-lg font-bold text-emerald-950">Dualar</h4>
         <div className="mt-3 flex flex-wrap gap-2">
           {duaData.map((d) => (
@@ -720,10 +720,10 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
           ))}
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[0.3fr_0.7fr]">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-right text-[12px] leading-6" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedDua.arabic}</div>
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-3 text-right text-[11px] leading-6 sm:p-4 sm:text-[12px]" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedDua.arabic}</div>
           <div className="space-y-3">
-            <div className="rounded-2xl bg-emerald-50 p-4"><div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Okunuş</div><div className="mt-2 text-base leading-8 text-slate-800">{selectedDua.translit}</div></div>
-            <div className="rounded-2xl border bg-white p-4"><div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Anlam</div><div className="mt-2 text-base leading-8 text-slate-800">{selectedDua.meaning}</div></div>
+            <div className="rounded-2xl bg-emerald-50 p-3 sm:p-4"><div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Okunuş</div><div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedDua.translit}</div></div>
+            <div className="rounded-2xl border bg-white p-3 sm:p-4"><div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Anlam</div><div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedDua.meaning}</div></div>
           </div>
         </div>
       </div>
@@ -731,7 +731,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
   );
 }
 
-function TesbihatView({ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState }) {
+function TesbihatView{ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
