@@ -24,11 +24,11 @@ import {
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v14";
+const STORAGE_KEY = "ilim-yolu-v15";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
-// Bursa Namaz Vakitlerini Ücretsiz Aladhan API Üzerinden Canlı Çeken Fonksiyon
+// Bursa Namaz Vakitlerini Canlı Çeken Fonksiyon
 async function fetchBursaPrayerTimes() {
   try {
     const res = await fetch(
@@ -643,7 +643,6 @@ function App() {
   const [celebrate, setCelebrate] = useState("");
   const [activeItemType, setActiveItemType] = useState("surah");
 
-  // Bursa Canlı Namaz Vakitleri State'i
   const [bursaTimes, setBursaTimes] = useState({
     imsak: "04:32",
     gunes: "06:05",
@@ -1189,9 +1188,14 @@ function QuickAction({ label, desc, onClick, theme }) {
   );
 }
 
+// Tam Düzeltilmiş SurahView Bileşeni
 function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead, activeItemType, setActiveItemType, theme, isDark }) {
   const isSurah = activeItemType === "surah";
-  const activeItem = isSurah ? selectedSurah : (duaData.find((d) => d.id === selectedDua) || duaData[0]);
+  
+  // Seçili öğenin Sure mi Dua mı olduğuna göre doğru nesneyi alma
+  const activeItem = isSurah 
+    ? selectedSurah 
+    : (duaData.find((d) => d.id === selectedDua) || duaData[0]);
 
   const activeStatus = isSurah ? (statuses[selectedSurah.id] || "not_started") : "not_started";
   const statusMeta = {
@@ -1214,8 +1218,11 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
   const openItem = (item) => {
     setActiveItemType(item.type);
-    if (item.type === "surah") setSelectedSurah(item.id);
-    else setSelectedDua(item.id);
+    if (item.type === "surah") {
+      setSelectedSurah(item.id);
+    } else {
+      setSelectedDua(item.id);
+    }
   };
 
   return (
@@ -1241,6 +1248,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
         <div className="mt-4 rounded-3xl p-3 sm:p-4 bg-emerald-500/5 border border-emerald-500/10">
           <div className="grid gap-4 lg:grid-cols-[0.55fr_0.45fr]">
+            {/* Arapça Metin Kartı */}
             <div className={`rounded-3xl border p-5 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">Arapça Metin</div>
               <div className="mt-3 text-xl sm:text-2xl leading-relaxed text-right font-serif tracking-wide select-none" dir="rtl" style={{ fontFamily: "'Amiri', serif", lineHeight: 2.4 }}>
@@ -1248,6 +1256,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
               </div>
             </div>
 
+            {/* Türkçe Okunuş ve Meal Kartları */}
             <div className="space-y-3">
               <div className={`rounded-2xl border p-4 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
                 <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Türkçe Okunuş</div>
