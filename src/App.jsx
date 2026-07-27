@@ -24,7 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v15";
+const STORAGE_KEY = "ilim-yolu-v16";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
@@ -481,7 +481,6 @@ const surahData = [
   },
 ];
 
-// Duaların Tam Eksiksiz Verileri
 const duaData = [
   {
     id: "ettehiyyat",
@@ -1192,10 +1191,8 @@ function QuickAction({ label, desc, onClick, theme }) {
 function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead, activeItemType, setActiveItemType, theme, isDark }) {
   const isSurah = activeItemType === "surah";
   
-  // Seçili öğenin Sure mi Dua mı olduğuna göre doğru nesneyi alma
-  const activeItem = isSurah 
-    ? selectedSurah 
-    : (duaData.find((d) => d.id === selectedDua) || duaData[0]);
+  // DÜZELTME BURADA YAPILDI: selectedDua zaten obje olarak App'ten geliyor.
+  const activeItem = isSurah ? selectedSurah : selectedDua;
 
   const activeStatus = isSurah ? (statuses[selectedSurah.id] || "not_started") : "not_started";
   const statusMeta = {
