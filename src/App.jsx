@@ -23,6 +23,12 @@ const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: fa
 
 const AYETEL_KURSI_MEALI = "Allah ki, O'ndan başka ilah yoktur. O hayydır, kayyûmdur. Kendisine ne bir uyuklama gelir ne de bir uyku. Göklerde ve yerdekilerin hepsi O'nundur. O'nun izni olmadan katında kim şefaat edebilir? Onların önlerindekini de arkalarındakini de bilir. Onlar ise O'nun dilediği kadarından başka ilminden hiçbir şeyi kavrayamazlar. O'nun kürsüsü gökleri ve yeri kaplamıştır. Onları koruyup gözetmek O'na ağır gelmez. O çok yücedir, çok büyüktür.";
 
+// Kullanıcı Veritabanı
+const USERS = [
+  { username: "furkancittir", pass: "1234" },
+  { username: "ilham", pass: "nasser" },
+];
+
 const surahData = [
   {
     id: "fatiha",
@@ -411,7 +417,7 @@ const surahData = [
 أَرَأَيْتَ إِن كَذَّبَ وَتَوَلَّىٰ
 أَلَمْ يَعْلَمْ بِأَنَّ اللّٰهَ يَرَىٰ
 كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ
-نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ
+نَاصِيَةٍ كَاذِبةٍ خَاطِئَةٍ
 فَلْيَدْعُ نَادِيَهُ
 سَنَدْعُ الزَّبَانِيَةَ
 كَلَّا لَا تُطِعْهُ وَاسْجُدْ وَاقْتَرِب`,
@@ -446,7 +452,7 @@ const duaData = [
   { id: "ettehiyyat", name: "Ettehiyyâtü", arabic: `التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ\nالسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ\nالسَّلَامُ عَلَيْنَا وَعَلَىٰ عِبَادِ اللّٰهِ الصَّالِحِينَ\nأَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ\nوَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ`, translit: `Ettehiyyâtü lillâhi vessalavâtü vettayyibât. Esselâmü aleyke eyyühen nebiyyü ve rahmetullâhi ve berakâtüh. Esselâmü aleynâ ve alâ ibâdillâhis sâlihîn. Eşhedü enlâ ilâhe illallâh. Ve eşhedü enne Muhammeden abdühû ve resûlüh.`, meaning: `Bütün selamlar, ibadetler ve güzel şeyler Allah içindir. Ey Nebi, Allah’ın selamı, rahmeti ve bereketi senin üzerine olsun. Selam bizim üzerimize ve Allah’ın salih kullarının üzerine olsun. Şahitlik ederim ki Allah’tan başka ilah yoktur. Ve şahitlik ederim ki Muhammed O’nun kulu ve elçisidir.` },
   { id: "salli", name: "Allâhumme Salli", arabic: `اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ\nوَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ`, translit: `Allâhümme salli alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.`, meaning: `Allah’ım! Efendimiz Muhammed’e ve onun âline salât eyle.` },
   { id: "barik", name: "Allâhumme Bârik", arabic: `اللّٰهُمَّ بَارِكْ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ\nوَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ`, translit: `Allâhümme bârik alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.`, meaning: `Allah’ım! Efendimiz Muhammed’e ve onun âline bereket ver.` },
-  { id: "rabbenaatina", name: "Rabbena Âtinâ", arabic: `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`, translit: `Rabbenâ âtinâ fid-dünyâ haseneten ve fil âhireti haseneten ve kınâ azâben nâr.`, meaning: `Rabbimiz! Bize dünyada iyilik, ahirette de iyilik ver ve bizi ateş azabından koru.` },
+  { id: "rabbenaantina", name: "Rabbena Âtinâ", arabic: `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`, translit: `Rabbenâ âtinâ fid-dünyâ haseneten ve fil âhireti haseneten ve kınâ azâben nâr.`, meaning: `Rabbimiz! Bize dünyada iyilik, ahirette de iyilik ver ve bizi ateş azabından koru.` },
   { id: "rabbenağfirli", name: "Rabbenağfirli", arabic: `رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ`, translit: `Rabbiğfir lî ve livâlideyye ve lil mü'minîne yevme yekûmül hisâb.`, meaning: `Rabbim! Beni, anne-babamı ve hesabın görüleceği günde bütün müminleri bağışla.` },
   { id: "kunut_hanefi", name: "Kunut (Hanefî)", arabic: `اللّٰهُمَّ إِنَّا نَسْتَعِينُكَ...`, translit: `Allâhümme innâ nesteînüke ve nestağfirüke...`, meaning: `Allah’ım! Senden yardım ister, bağışlanma diler ve Sana dayanırız.` },
   { id: "kunut_shafii", name: "Kunut (Şâfiî)", arabic: `اللّٰهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ...`, translit: `Allâhümmehdinî fîmen hedeyt...`, meaning: `Allah’ım! Hidayet verdiklerin arasında bana da hidayet ver.` },
@@ -467,7 +473,7 @@ const zikrData = [
 
 const DEFAULT_STATE = {
   auth: false,
-  username: "furkancittir",
+  username: "",
   level: 3,
   xp: 1150,
   gems: 24,
@@ -602,8 +608,11 @@ function App() {
 
   function login(e) {
     e?.preventDefault?.();
-    if (user.trim().toLowerCase() === "furkancittir" && pass === "1234") {
-      setState((s) => ({ ...s, auth: true, selectedTab: "home" }));
+    const inputUser = user.trim().toLowerCase();
+    const foundUser = USERS.find((u) => u.username.toLowerCase() === inputUser && u.pass === pass);
+
+    if (foundUser) {
+      setState((s) => ({ ...s, auth: true, username: foundUser.username, selectedTab: "home" }));
       setLoginError("");
     } else {
       setLoginError("Kullanıcı adı veya şifre yanlış.");
@@ -991,7 +1000,6 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
         <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-3 sm:p-4">
           <div className="grid gap-3 lg:grid-cols-[0.55fr_0.45fr]">
-            {/* Tekleştirilmiş Arapça Kartı */}
             <div className="rounded-3xl border border-slate-200 bg-white p-4">
               <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Arapça Metin</div>
               <div className="mt-3 text-lg leading-10 text-slate-800 text-right font-serif" dir="rtl" style={{ lineHeight: 2.3 }}>
@@ -999,7 +1007,6 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
               </div>
             </div>
 
-            {/* Okunuş ve Meal Kartı */}
             <div className="space-y-3 rounded-3xl bg-emerald-50 p-3 sm:p-4">
               <div className="rounded-2xl bg-white p-3 sm:p-4">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Okunuş</div>
@@ -1173,11 +1180,15 @@ function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZi
 
 function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
   const max = Math.max(5, ...prayerSeries.map((b) => b.count));
+  const initials = state.username ? state.username.slice(0, 2).toUpperCase() : "U";
+
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-lg font-bold text-emerald-800">FÇ</div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-lg font-bold text-emerald-800">
+            {initials}
+          </div>
           <div>
             <h3 className="text-lg font-bold text-emerald-950">{state.username}</h3>
             <p className="text-xs text-slate-500">Profil Bilgileri</p>
@@ -1256,4 +1267,4 @@ function StatusBadge({ status }) {
   return <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${style}`}>{label}</span>;
 }
 
-export default App; 
+export default App;
