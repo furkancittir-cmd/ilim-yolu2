@@ -732,7 +732,7 @@ function App() {
     return [
       { key: "istigfar", label: "İstiğfar ve Selam", title: "Estagfirullah, estagfirullah, estagfirullah. Allahümme entes-selamü ve minkes-selam, tebarekte ya zel-celali vel-ikram.", meaning: "Allah’ım! Sen selam sahibisin, selam/esenlik ancak Sendedir. Ey celal ve ikram sahibi Rabbim, Sen ne yücesin.", count: 1 },
       ...(state.tesbihatType === "long" ? [{ key: "salavat", label: "Salavat", title: "Allâhümme salli alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.", meaning: "Peygamber Efendimize salavat.", count: 1 }] : []),
-      { key: "ayetelkursi", label: "Ayetel Kürsi", title: ayet?.translit || "", meaning: ayet?.meaning || "", arabic: ayet?.arabic || "", count: 1 },
+      { key: "ayetelkursi", label: "Ayetel Kürsi", title: ayet?.translit || "Allâhu lâ ilâhe illâ hüve'l-hayyü'l-kayyûm. Lâ te'huzühû sinetün ve lâ nevm. Lehû mâ fis-semâvâti ve mâ fil ard. Menzellezî yeşfeu indehû illâ bi iznih. Ya'lemü mâ beyne eydîhim ve mâ halfehum. Ve lâ yuhîtûne bi şey'in min ilmihî illâ bimâ şâe. Vesi'a kürsiyyühüs-semâvâti vel ard. Ve lâ yeûdühû hıfzuhumâ. Ve huvel aliyyül azîm.", meaning: ayet?.meaning || "", arabic: ayet?.arabic || "", count: 1 },
       { key: "subhanallah", label: "Sübhanallah", title: "Sübhanallah", meaning: "Allah’ı bütün eksikliklerden tenzih ederim.", count: 33 },
       { key: "elhamdulillah", label: "Elhamdülillah", title: "Elhamdülillah", meaning: "Hamd Allah’a mahsustur.", count: 33 },
       { key: "allahu_ekber", label: "Allahu Ekber", title: "Allahu Ekber", meaning: "Allah en büyüktür.", count: 33 },
@@ -957,13 +957,32 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
     not_started: ["Sıfırlandı", "bg-slate-100 text-slate-600"],
   };
 
+  const combinedMenu = [
+    { type: "surah", id: "fatiha", label: "Fâtiha Suresi" },
+    ...filteredSurahs.filter((s) => s.id !== "fatiha").map((s) => ({ type: "surah", id: s.id, label: s.name })),
+    { type: "dua", id: "ayetelkursi", label: "Ayetel Kürsi" },
+    { type: "dua", id: "ettehiyyat", label: "Ettehiyyâtü" },
+    { type: "dua", id: "kunut_hanefi", label: "Kunut (Hanefî)" },
+    { type: "dua", id: "kunut_shafii", label: "Kunut (Şâfiî)" },
+    { type: "dua", id: "salli", label: "Salli" },
+    { type: "dua", id: "barik", label: "Barik" },
+    { type: "dua", id: "rabbenaatina", label: "Rabbena Âtinâ" },
+    { type: "dua", id: "rabbenağfirli", label: "Rabbenağfirli" },
+  ];
+
+  const currentDua = duaData.find((d) => d.id === selectedDua) || duaData[0];
+  const openItem = (item) => {
+    if (item.type === "surah") setSelectedSurah(item.id);
+    else setSelectedDua(item.id);
+  };
+
   return (
     <div className="space-y-4">
       <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="text-xl font-bold text-emerald-950">Sureyi Oku</h3>
-            <p className="text-sm text-slate-600">Okuma paneli üstte, seçim listesi altta.</p>
+            <p className="text-sm text-slate-600">Okuma paneli üstte, sıralı menü altta.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex items-center gap-2 rounded-2xl border bg-slate-50 px-3 py-2 text-sm">
@@ -979,8 +998,8 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
         </div>
 
         <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-3 sm:p-4">
-          <div className="grid gap-3 lg:grid-cols-[0.32fr_0.68fr]">
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 text-right sm:p-4">
+          <div className="grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
+            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
               <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Arapça</div>
               <div className="mt-2 text-[11px] leading-6 text-slate-700 sm:text-[12px]" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedSurah.arabic}</div>
             </div>
@@ -996,69 +1015,66 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
             </div>
           </div>
 
-          <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Durum</div>
-                <div className="mt-1 text-xs text-slate-700 sm:text-sm">Hafızada / devam ediyor / sıfırlandı</div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
+            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Durum</div>
+                  <div className="mt-1 text-xs text-slate-700 sm:text-sm">Hafızada / devam ediyor / sıfırlandı</div>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
               </div>
-              <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-2xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">Hafızada</button>
+                <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Devam ediyor</button>
+                <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Sıfırla</button>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">+1 okuma</button>
+                <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold">{selectedSurah.id} · {progress[selectedSurah.id] || 0} kayıt</div>
+              </div>
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-2xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm">Hafızada</button>
-              <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Devam ediyor</button>
-              <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-2xl border px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm">Sıfırla</button>
-            </div>
-          </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">+1 okuma</button>
-            <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold">{selectedSurah.id} · {progress[selectedSurah.id] || 0} kayıt</div>
+            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Seçili Dua</div>
+              <div className="mt-2 text-base font-bold text-slate-900">{currentDua.name}</div>
+              <div className="mt-3 rounded-2xl bg-slate-50 p-3 text-right text-[11px] leading-6 sm:p-4 sm:text-[12px]" dir="rtl">{currentDua.arabic}</div>
+              <div className="mt-3 rounded-2xl bg-emerald-50 p-3 sm:p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Okunuş</div>
+                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{currentDua.translit}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-        <h4 className="text-lg font-bold text-emerald-950">Suralar Seçim Listesi</h4>
-        <p className="text-sm text-slate-500">Aşağıdan seç, üstteki okuma alanı değişsin.</p>
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {filteredSurahs.map((s) => {
-            const count = progress[s.id] || 0;
-            const st = statuses[s.id] || (count >= 33 ? "memorized" : count > 0 ? "in_progress" : "not_started");
+        <h4 className="text-lg font-bold text-emerald-950">Sıralı Menü</h4>
+        <p className="text-sm text-slate-500">Sureler ve dualar tek menüde.</p>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {combinedMenu.map((item) => {
+            const isActive = item.type === "surah" ? item.id === selectedSurah.id : item.id === selectedDua.id;
+            const count = item.type === "surah" ? (progress[item.id] || 0) : 0;
             return (
-              <button key={s.id} onClick={() => setSelectedSurah(s.id)} className={`rounded-3xl border p-3 text-left transition sm:p-4 ${selectedSurah.id === s.id ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
+              <button key={`${item.type}-${item.id}`} onClick={() => openItem(item)} className={`rounded-3xl border p-3 text-left transition sm:p-4 ${isActive ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-sm font-bold text-slate-900 sm:text-base">{s.name}</div>
-                    <div className="text-[11px] text-slate-500 sm:text-xs">{s.arabicTitle} · {s.verses} ayet</div>
+                    <div className="text-sm font-bold text-slate-900 sm:text-base">{item.label}</div>
+                    <div className="text-[11px] text-slate-500 sm:text-xs">{item.type === "surah" ? "Sure" : "Dua"}</div>
                   </div>
-                  <StatusBadge status={st} />
+                  {item.type === "surah" ? <StatusBadge status={statuses[item.id] || (count >= 33 ? "memorized" : count > 0 ? "in_progress" : "not_started")} /> : <span className="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-800">Dua</span>}
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-slate-200">
-                  <div className="h-2 rounded-full bg-emerald-600" style={{ width: `${Math.min(100, (count / 33) * 100)}%` }} />
-                </div>
-                <div className="mt-2 text-[11px] text-slate-500 sm:text-xs">Bu sure: {count} okuma</div>
+                {item.type === "surah" && (
+                  <>
+                    <div className="mt-2 h-2 rounded-full bg-slate-200">
+                      <div className="h-2 rounded-full bg-emerald-600" style={{ width: `${Math.min(100, (count / 33) * 100)}%` }} />
+                    </div>
+                    <div className="mt-2 text-[11px] text-slate-500 sm:text-xs">Bu sure: {count} okuma</div>
+                  </>
+                )}
               </button>
             );
           })}
-        </div>
-      </div>
-
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-        <h4 className="text-lg font-bold text-emerald-950">Dualar</h4>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {duaData.map((d) => (
-            <button key={d.id} onClick={() => setSelectedDua(d.id)} className={`rounded-2xl border px-3 py-2 text-sm ${selectedDua.id === d.id ? "border-emerald-500 bg-emerald-50" : "bg-slate-50"}`}>
-              {d.name}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[0.3fr_0.7fr]">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-3 text-right text-[11px] leading-6 sm:p-4 sm:text-[12px]" dir="rtl" style={{ lineHeight: 2.05 }}>{selectedDua.arabic}</div>
-          <div className="space-y-3">
-            <div className="rounded-2xl bg-emerald-50 p-3 sm:p-4"><div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Okunuş</div><div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedDua.translit}</div></div>
-            <div className="rounded-2xl border bg-white p-3 sm:p-4"><div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Anlam</div><div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedDua.meaning}</div></div>
-          </div>
         </div>
       </div>
     </div>
