@@ -1,33 +1,61 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
+  Award,
   BookOpen,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Crown,
+  Eye,
+  EyeOff,
   Gem,
+  Gamepad2,
   Home,
   Layers3,
+  LogIn,
   LogOut,
+  Medal,
+  RotateCcw,
   Search,
+  ShieldCheck,
   Sparkles,
   Trophy,
   User,
+  Volume2,
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v8";
+const STORAGE_KEY = "ilim-yolu-v10";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
-const AYETEL_KURSI_MEALI = "Allah ki, O'ndan başka ilah yoktur. O hayydır, kayyûmdur. Kendisine ne bir uyuklama gelir ne de bir uyku. Göklerde ve yerdekilerin hepsi O'nundur. O'nun izni olmadan katında kim şefaat edebilir? Onların önlerindekini de arkalarındakini de bilir. Onlar ise O'nun dilediği kadarından başka ilminden hiçbir şeyi kavrayamazlar. O'nun kürsüsü gökleri ve yeri kaplamıştır. Onları koruyup gözetmek O'na ağır gelmez. O çok yücedir, çok büyüktür.";
+// Bursa Namaz Vakitleri
+function getBursaPrayerTimes() {
+  return {
+    imsak: "04:32",
+    gunes: "06:05",
+    ogle: "13:12",
+    ikindi: "16:58",
+    aksam: "20:10",
+    yatsi: "21:38",
+  };
+}
 
-// Kullanıcı Veritabanı
+// Dokunsal Geri Bildirim (Titreşim)
+function triggerHaptic() {
+  if (typeof window !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate(45);
+  }
+}
+
 const USERS = [
   { username: "furkancittir", pass: "1234" },
   { username: "ilham", pass: "nasser" },
 ];
+
+const AYETEL_KURSI_MEALI = "Allah ki, O'ndan başka ilah yoktur. O hayydır, kayyûmdur. Kendisine ne bir uyuklama gelir ne de bir uyku. Göklerde ve yerdekilerin hepsi O'nundur. O'nun izni olmadan katında kim şefaat edebilir? Onların önlerindekini de arkalarındakini de bilir. Onlar ise O'nun dilediği kadarından başka ilminden hiçbir şeyi kavrayamazlar. O'nun kürsüsü gökleri ve yeri kaplamıştır. Onları koruyup gözetmek O'na ağır gelmez. O çok yücedir, çok büyüktür.";
 
 const surahData = [
   {
@@ -417,7 +445,7 @@ const surahData = [
 أَرَأَيْتَ إِن كَذَّبَ وَتَوَلَّىٰ
 أَلَمْ يَعْلَمْ بِأَنَّ اللّٰهَ يَرَىٰ
 كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ
-نَاصِيَةٍ كَاذِبةٍ خَاطِئَةٍ
+نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ
 فَلْيَدْعُ نَادِيَهُ
 سَنَدْعُ الزَّبَانِيَةَ
 كَلَّا لَا تُطِعْهُ وَاسْجُدْ وَاقْتَرِب`,
@@ -474,17 +502,16 @@ const zikrData = [
 const DEFAULT_STATE = {
   auth: false,
   username: "",
-  level: 3,
-  xp: 1150,
-  gems: 24,
-  dailyStreak: 6,
+  level: 1,
+  xp: 0,
+  gems: 0,
+  dailyStreak: 0,
   prayerDone: emptyPrayer(),
   prayerHistory: [],
   lastPrayerDate: "",
-  missedPrayers: 12,
-  monthlyMissed: 4,
-  surahProgress: { fatiha: 33, ihlas: 33, felak: 33, nas: 33, ayetelkursi: 12 },
-  surahStatuses: { fatiha: "memorized", ihlas: "memorized", felak: "memorized", nas: "memorized", ayetelkursi: "in_progress" },
+  missedPrayers: 0,
+  surahProgress: {},
+  surahStatuses: {},
   totalReadCounts: {},
   selectedTab: "home",
   selectedSurah: "fatiha",
@@ -508,10 +535,10 @@ function normalizeState(s) {
     prayerHistory: Array.isArray(s.prayerHistory) ? s.prayerHistory : [],
     dailyLogs: s.dailyLogs || { date: "", zikrs: [], duas: [] },
     totalReadCounts: s.totalReadCounts || {},
-    surahProgress: s.surahProgress || DEFAULT_STATE.surahProgress,
-    surahStatuses: s.surahStatuses || DEFAULT_STATE.surahStatuses,
+    surahProgress: s.surahProgress || {},
+    surahStatuses: s.surahStatuses || {},
     zikrCounts: s.zikrCounts || {},
-    selectedTab: s.selectedTab && s.selectedTab !== "oyun" ? s.selectedTab : "home",
+    selectedTab: s.selectedTab || "home",
   };
 }
 
@@ -566,7 +593,7 @@ function App() {
   }, [state]);
 
   useEffect(() => {
-    setState((s) => ({ ...s, level: Math.floor(s.xp / 500) + 1 }));
+    setState((s) => ({ ...s, level: Math.floor(s.xp / 100) + 1 }));
   }, [state.xp]);
 
   useEffect(() => {
@@ -589,6 +616,7 @@ function App() {
   const prayerSeries = getPrayerSeries(state.prayerHistory, 7);
   const todayCount = Object.values(state.prayerDone).filter(Boolean).length;
   const prayerFinished = todayCount === 5;
+  const bursaTimes = getBursaPrayerTimes();
 
   const selectedSurah = surahData.find((s) => s.id === state.selectedSurah) || surahData[0];
   const selectedDua = duaData.find((d) => d.id === state.selectedDua) || duaData[0];
@@ -624,6 +652,7 @@ function App() {
   }
 
   function markPrayer(id) {
+    triggerHaptic();
     setState((s) => {
       const nextDone = { ...s.prayerDone, [id]: !s.prayerDone[id] };
       const count = Object.values(nextDone).filter(Boolean).length;
@@ -642,8 +671,8 @@ function App() {
         prayerDone: nextDone,
         prayerHistory: nextHistory.slice(-30),
         lastPrayerDate: t,
-        xp: s.xp + (count === 5 ? 50 : 10),
-        gems: s.gems + (count === 5 ? 2 : 0),
+        xp: s.xp + (nextDone[id] ? 20 : -20),
+        gems: s.gems + (count === 5 ? 5 : 0),
       };
     });
   }
@@ -656,7 +685,7 @@ function App() {
         surahProgress: { ...s.surahProgress, [id]: next },
         totalReadCounts: { ...(s.totalReadCounts || {}), [id]: ((s.totalReadCounts || {})[id] || 0) + 1 },
         surahStatuses: { ...s.surahStatuses, [id]: next >= 33 ? "memorized" : next > 0 ? "in_progress" : "not_started" },
-        xp: s.xp + 2,
+        xp: s.xp + 5,
       };
     });
   }
@@ -679,6 +708,7 @@ function App() {
   }
 
   function addZikr() {
+    triggerHaptic();
     setState((s) => {
       const next = (s.zikrCounts?.[s.zikrSelected] || 0) + 1;
       const t = todayKey();
@@ -715,6 +745,7 @@ function App() {
   const currentStepCount = state.tesbihatProgress?.[state.tesbihatIndex] || 0;
 
   function incTesbihatStep() {
+    triggerHaptic();
     setState((s) => {
       const steps = currentTesbihatSteps();
       const step = steps[s.tesbihatIndex] || steps[0];
@@ -737,6 +768,7 @@ function App() {
   }
 
   function completeTesbihat() {
+    triggerHaptic();
     setCelebrate("Tesbihat başarıyla tamamlandı!");
     setState((s) => ({ ...s, xp: s.xp + 50, gems: s.gems + 2, tesbihatIndex: 0, tesbihatProgress: [] }));
   }
@@ -756,11 +788,11 @@ function App() {
           <div className="mt-4 space-y-3">
             <label className="block">
               <div className="mb-1 text-xs font-semibold">Kullanıcı adı</div>
-              <input value={user} onChange={(e) => setUser(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" />
+              <input value={user} onChange={(e) => setUser(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" placeholder="Kullanıcı adı" />
             </label>
             <label className="block">
               <div className="mb-1 text-xs font-semibold">Şifre</div>
-              <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" />
+              <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" placeholder="Şifre" />
             </label>
             <button type="submit" className="w-full rounded-2xl bg-emerald-700 py-3 font-semibold text-white hover:bg-emerald-800 transition">
               Giriş Yap
@@ -803,24 +835,26 @@ function App() {
           </div>
         )}
 
-        {state.selectedTab === "home" && <HomeView state={state} todayCount={todayCount} prayerFinished={prayerFinished} prayerStreak={prayerStreak} prayerSeries={prayerSeries} markPrayer={markPrayer} markDuaRead={markDuaRead} />}
+        {state.selectedTab === "home" && <HomeView state={state} bursaTimes={bursaTimes} todayCount={todayCount} prayerFinished={prayerFinished} prayerStreak={prayerStreak} prayerSeries={prayerSeries} markPrayer={markPrayer} markDuaRead={markDuaRead} setState={setState} />}
         {state.selectedTab === "sureler" && <SurahView selectedSurah={selectedSurah} selectedDua={selectedDua} filteredSurahs={filteredSurahs} search={search} setSearch={setSearch} sort={state.surahSort} setSort={(v) => setState((s) => ({ ...s, surahSort: v }))} progress={state.surahProgress} statuses={state.surahStatuses} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} setSelectedDua={(id) => setState((s) => ({ ...s, selectedDua: id }))} setSurahStatus={setSurahStatus} addSurahRead={addSurahRead} activeItemType={activeItemType} setActiveItemType={setActiveItemType} />}
         {state.selectedTab === "tesbihat" && <TesbihatView state={state} tesbihatSteps={tesbihatSteps} currentStep={currentStep} currentStepCount={currentStepCount} incTesbihatStep={incTesbihatStep} prevTesbihatStep={prevTesbihatStep} completeTesbihat={completeTesbihat} setState={setState} />}
         {state.selectedTab === "zikir" && <ZikirView zikrData={zikrData} selectedZikr={selectedZikr} selectedZikrCount={selectedZikrCount} target={state.zikrTarget} selectZikr={selectZikr} addZikr={addZikr} resetZikr={resetZikr} counts={state.zikrCounts || {}} />}
+        {state.selectedTab === "oyun" && <GameView surah={selectedSurah} surahList={surahData} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} addXp={(val) => setState((s) => ({ ...s, xp: s.xp + val }))} />}
         {state.selectedTab === "profil" && <ProfileView state={state} prayerStreak={prayerStreak} prayerSeries={prayerSeries} logout={logout} />}
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-5 gap-1 p-2">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-6 gap-1 p-2">
           {[
             ["home", Home, "Ana Sayfa"],
             ["sureler", BookOpen, "Sureler"],
             ["tesbihat", Layers3, "Tesbihat"],
             ["zikir", Sparkles, "Zikirmatic"],
+            ["oyun", Gamepad2, "Ezber Modu"],
             ["profil", User, "Profil"],
           ].map(([key, Icon, label]) => (
-            <button key={key} onClick={() => setState((s) => ({ ...s, selectedTab: key }))} className={`flex flex-col items-center justify-center rounded-2xl py-2 text-xs font-semibold ${state.selectedTab === key ? "bg-emerald-700 text-white" : "text-slate-600 hover:bg-slate-50"}`}>
-              <Icon className="h-5 w-5" />
+            <button key={key} onClick={() => setState((s) => ({ ...s, selectedTab: key }))} className={`flex flex-col items-center justify-center rounded-2xl py-2 text-[11px] font-semibold ${state.selectedTab === key ? "bg-emerald-700 text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+              <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               {label}
             </button>
           ))}
@@ -830,7 +864,7 @@ function App() {
   );
 }
 
-function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSeries, markPrayer, markDuaRead }) {
+function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak, prayerSeries, markPrayer, markDuaRead, setState }) {
   const prayerCards = [
     { id: "sabah", tr: "Sabah", en: "Fajr" },
     { id: "ogle", tr: "Öğle", en: "Dhuhr" },
@@ -845,6 +879,24 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
   return (
     <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
+        {/* Bursa Namaz Vakitleri Kartı */}
+        <section className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2 font-bold text-emerald-950">
+              <Clock className="h-5 w-5 text-emerald-700" /> Bursa Namaz Vakitleri
+            </div>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Sabit Konum</span>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
+            <TimeBox label="İmsak" time={bursaTimes.imsak} />
+            <TimeBox label="Güneş" time={bursaTimes.gunes} />
+            <TimeBox label="Öğle" time={bursaTimes.ogle} />
+            <TimeBox label="İkindi" time={bursaTimes.ikindi} />
+            <TimeBox label="Akşam" time={bursaTimes.aksam} />
+            <TimeBox label="Yatsı" time={bursaTimes.yatsi} />
+          </div>
+        </section>
+
         <section className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -935,6 +987,15 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
           <p className="mt-2 text-sm leading-7 text-slate-600">Bu bölüm gerçek verilerinizle çalışır. Namaz işaretleyince streak ve grafik anlık güncellenir; zikir ve dua kayıtları da buraya yansır.</p>
         </section>
       </aside>
+    </div>
+  );
+}
+
+function TimeBox({ label, time }) {
+  return (
+    <div className="rounded-xl bg-slate-50 p-2 border border-slate-100">
+      <div className="text-[10px] text-slate-500 font-semibold uppercase">{label}</div>
+      <div className="font-bold text-emerald-900 text-sm mt-0.5">{time}</div>
     </div>
   );
 }
@@ -1145,7 +1206,7 @@ function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZi
 
           <button onClick={addZikr} className="mt-6 flex h-64 w-64 items-center justify-center rounded-full border-8 border-white bg-emerald-700 text-white shadow-2xl shadow-emerald-200 transition active:scale-[0.96] sm:h-80 sm:w-80">
             <div className="text-center">
-              <div className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-100">Dokun</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-100">Dokun (Titreşimli)</div>
               <div className="mt-2 text-6xl font-black leading-none sm:text-8xl">{selectedZikrCount}</div>
               <div className="mt-2 text-sm font-semibold text-emerald-100 sm:text-lg">{selectedZikr.name}</div>
             </div>
@@ -1178,9 +1239,78 @@ function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZi
   );
 }
 
+// 🎮 EZBER MODU / OYUN
+function GameView({ surah, surahList, setSelectedSurah, addXp }) {
+  const words = surah.translit.split(" ");
+  const [hiddenIndices, setHiddenIndices] = useState([1, 3, 5, 8]);
+
+  const toggleWord = (idx) => {
+    triggerHaptic();
+    setHiddenIndices((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+    addXp(2);
+  };
+
+  const revealAll = () => {
+    triggerHaptic();
+    setHiddenIndices([]);
+  };
+
+  const hideRandom = () => {
+    triggerHaptic();
+    const count = Math.floor(words.length / 3);
+    const randoms = new Set();
+    while (randoms.size < count) {
+      randoms.add(Math.floor(Math.random() * words.length));
+    }
+    setHiddenIndices(Array.from(randoms));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-emerald-950">🎮 Ezber Testi Modu</h3>
+            <p className="text-sm text-slate-600">Gizli kelimelerin üzerine basarak hafızanı test et.</p>
+          </div>
+          <select value={surah.id} onChange={(e) => setSelectedSurah(e.target.value)} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold outline-none">
+            {surahList.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+          <div className="text-xs font-bold uppercase tracking-widest text-emerald-800 mb-3">{surah.name} - Türkçe Okunuş</div>
+          <div className="flex flex-wrap gap-2 leading-8">
+            {words.map((word, idx) => {
+              const isHidden = hiddenIndices.includes(idx);
+              return (
+                <button key={idx} onClick={() => toggleWord(idx)} className={`rounded-xl px-2.5 py-1 text-sm font-medium transition ${isHidden ? "bg-emerald-200 text-transparent blur-sm hover:blur-none select-none" : "bg-white border border-slate-200 text-slate-900 shadow-sm"}`}>
+                  {word}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button onClick={revealAll} className="flex items-center gap-2 rounded-2xl bg-emerald-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-emerald-800 transition">
+            <Eye className="h-4 w-4" /> Tümünü Göster
+          </button>
+          <button onClick={hideRandom} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+            <EyeOff className="h-4 w-4" /> Rastgele Gizle
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
   const max = Math.max(5, ...prayerSeries.map((b) => b.count));
   const initials = state.username ? state.username.slice(0, 2).toUpperCase() : "U";
+  const totalZikrs = Object.values(state.zikrCounts || {}).reduce((a, b) => a + b, 0);
 
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
@@ -1199,7 +1329,7 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
           <ProfileLine label="Seviye" value={state.level} />
           <ProfileLine label="Namaz Streak" value={`${prayerStreak} Gün`} />
           <ProfileLine label="Gems" value={state.gems} />
-          <ProfileLine label="Kaza Namazı" value={state.missedPrayers} />
+          <ProfileLine label="Toplam Çekilen Zikir" value={totalZikrs} />
         </div>
         <div className="mt-6">
           <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-600 px-4 py-3 font-semibold text-white hover:bg-rose-700 transition">
@@ -1209,6 +1339,18 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
       </div>
 
       <div className="space-y-4">
+        {/* Başarımlar / Rozetler */}
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+          <h4 className="text-lg font-bold text-emerald-950">Başarımlar & Rozetler</h4>
+          <p className="text-sm text-slate-500 mb-3">İbadet ve ezber hedeflerine ulaştıkça açılır.</p>
+          <div className="grid grid-cols-2 gap-2">
+            <Badge title="🥇 İlk Adım" desc="Sisteme kayıt olundu" active={true} />
+            <Badge title="🔥 3 Günlük Seri" desc="3 Gün namaz kılındı" active={prayerStreak >= 3} />
+            <Badge title="📿 Zikir Üstadı" desc="100+ Zikir çekildi" active={totalZikrs >= 100} />
+            <Badge title="🏆 XP Avcısı" desc="100+ XP kazanıldı" active={state.xp >= 100} />
+          </div>
+        </div>
+
         <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
           <h4 className="text-lg font-bold text-emerald-950">Namaz Geçmişi</h4>
           <p className="text-sm text-slate-500">Son 7 gün içindeki kılınan namaz verileri.</p>
@@ -1224,15 +1366,16 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
             ))}
           </div>
         </div>
-
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <h4 className="text-lg font-bold text-emerald-950">Bugünkü Etkinlikler</h4>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <ProfileLine label="Tamamlanan Zikir Türü" value={(state.dailyLogs?.date === todayKey() && state.dailyLogs?.zikrs?.length) || 0} />
-            <ProfileLine label="Okunan Dua Türü" value={(state.dailyLogs?.date === todayKey() && state.dailyLogs?.duas?.length) || 0} />
-          </div>
-        </div>
       </div>
+    </div>
+  );
+}
+
+function Badge({ title, desc, active }) {
+  return (
+    <div className={`rounded-2xl border p-3 transition ${active ? "bg-emerald-50 border-emerald-300" : "bg-slate-50 opacity-40"}`}>
+      <div className="font-bold text-sm text-slate-900">{title}</div>
+      <div className="text-xs text-slate-500 mt-0.5">{desc}</div>
     </div>
   );
 }
