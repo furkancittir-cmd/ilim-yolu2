@@ -1065,7 +1065,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
   );
 }
 
-function TesbihatView{ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState }) {
+function TesbihatView({ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
