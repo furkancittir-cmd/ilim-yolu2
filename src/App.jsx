@@ -13,21 +13,18 @@ import {
   Gem,
   Gamepad2,
   Home,
-  Layers3,
-  LogIn,
+  Layers,
   LogOut,
-  Medal,
-  RotateCcw,
+  Moon,
   Search,
-  ShieldCheck,
   Sparkles,
+  Sun,
   Trophy,
   User,
-  Volume2,
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v10";
+const STORAGE_KEY = "ilim-yolu-v11";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
@@ -41,6 +38,15 @@ function getBursaPrayerTimes() {
     aksam: "20:10",
     yatsi: "21:38",
   };
+}
+
+// Otomatik Dark Mode Kontrolü (Akşam 20:10 ile İmsak 04:32 arası)
+function isNightTime() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const aksamMinutes = 20 * 60 + 10; // 20:10
+  const imsakMinutes = 4 * 60 + 32;  // 04:32
+  return currentMinutes >= aksamMinutes || currentMinutes < imsakMinutes;
 }
 
 // Dokunsal Geri Bildirim (Titreşim)
@@ -445,7 +451,7 @@ const surahData = [
 أَرَأَيْتَ إِن كَذَّبَ وَتَوَلَّىٰ
 أَلَمْ يَعْلَمْ بِأَنَّ اللّٰهَ يَرَىٰ
 كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ
-نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ
+نَاصِيَةٍ كَاذِبةٍ خَاطِئَةٍ
 فَلْيَدْعُ نَادِيَهُ
 سَنَدْعُ الزَّبَانِيَةَ
 كَلَّا لَا تُطِعْهُ وَاسْجُدْ وَاقْتَرِب`,
@@ -506,6 +512,7 @@ const DEFAULT_STATE = {
   xp: 0,
   gems: 0,
   dailyStreak: 0,
+  isDarkMode: isNightTime(),
   prayerDone: emptyPrayer(),
   prayerHistory: [],
   lastPrayerDate: "",
@@ -524,13 +531,13 @@ const DEFAULT_STATE = {
   zikrCounts: {},
   zikrTarget: 33,
   dailyLogs: { date: "", zikrs: [], duas: [] },
-  notifications: ["Bugün Öğle namazını kılmayı unutma!", "Felak Suresi hatırlatma günü!", "Tesbihat zamanı!"],
 };
 
 function normalizeState(s) {
   return {
     ...DEFAULT_STATE,
     ...s,
+    isDarkMode: typeof s.isDarkMode === "boolean" ? s.isDarkMode : isNightTime(),
     prayerDone: s.prayerDone || emptyPrayer(),
     prayerHistory: Array.isArray(s.prayerHistory) ? s.prayerHistory : [],
     dailyLogs: s.dailyLogs || { date: "", zikrs: [], duas: [] },
@@ -587,6 +594,14 @@ function App() {
   const [search, setSearch] = useState("");
   const [celebrate, setCelebrate] = useState("");
   const [activeItemType, setActiveItemType] = useState("surah");
+
+  // Google Fonts (Amiri Fontu Yükle)
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href = "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -773,28 +788,45 @@ function App() {
     setState((s) => ({ ...s, xp: s.xp + 50, gems: s.gems + 2, tesbihatIndex: 0, tesbihatProgress: [] }));
   }
 
+  const toggleDarkMode = () => {
+    setState((s) => ({ ...s, isDarkMode: !s.isDarkMode }));
+  };
+
+  const isDark = state.isDarkMode;
   const selectedZikrCount = state.zikrCounts?.[state.zikrSelected] || 0;
+
+  // Temalı Sınıf İsimleri (Gündüz / Gece Modu)
+  const themeClasses = {
+    bg: isDark ? "bg-[#0b1311] text-emerald-50" : "bg-[#f4f7f4] text-slate-900",
+    cardBg: isDark ? "bg-[#13221e] border-emerald-900/60 shadow-lg" : "bg-white border-emerald-100/80 shadow-sm",
+    subCardBg: isDark ? "bg-[#0e1b17] border-emerald-950" : "bg-emerald-50/50 border-emerald-100",
+    textHeading: isDark ? "text-emerald-100" : "text-emerald-950",
+    textSub: isDark ? "text-emerald-400" : "text-emerald-700",
+    textMuted: isDark ? "text-emerald-300/70" : "text-slate-500",
+    buttonPrimary: "bg-emerald-700 hover:bg-emerald-800 text-white font-semibold transition active:scale-95",
+    accentGlow: isDark ? "shadow-[0_0_20px_rgba(16,185,129,0.15)]" : "",
+  };
 
   if (!state.auth) {
     return (
-      <div className="min-h-screen bg-[#faf7f0] p-4 text-slate-900 flex items-center justify-center">
-        <form onSubmit={login} className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-            <Sparkles className="h-3.5 w-3.5" /> İlim Yolu
+      <div className={`min-h-screen p-4 flex items-center justify-center transition-colors duration-300 ${themeClasses.bg}`}>
+        <form onSubmit={login} className={`w-full max-w-sm rounded-3xl border p-6 ${themeClasses.cardBg}`}>
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" /> İlim Yolu
           </div>
-          <h1 className="mt-4 text-2xl font-black text-emerald-950">Giriş Yap</h1>
-          <p className="mt-1 text-xs text-slate-500">Kişisel ibadet alanına erişmek için giriş yap.</p>
-          {loginError && <div className="mt-4 rounded-xl bg-rose-50 p-3 text-xs font-semibold text-rose-600">{loginError}</div>}
+          <h1 className={`mt-4 text-2xl font-black ${themeClasses.textHeading}`}>Giriş Yap</h1>
+          <p className={`mt-1 text-xs ${themeClasses.textMuted}`}>Kişisel ibadet alanına erişmek için giriş yap.</p>
+          {loginError && <div className="mt-4 rounded-xl bg-rose-500/10 border border-rose-500/20 p-3 text-xs font-semibold text-rose-400">{loginError}</div>}
           <div className="mt-4 space-y-3">
             <label className="block">
-              <div className="mb-1 text-xs font-semibold">Kullanıcı adı</div>
-              <input value={user} onChange={(e) => setUser(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" placeholder="Kullanıcı adı" />
+              <div className={`mb-1 text-xs font-semibold ${themeClasses.textMuted}`}>Kullanıcı adı</div>
+              <input value={user} onChange={(e) => setUser(e.target.value)} className={`w-full rounded-2xl border px-4 py-3 outline-none transition ${isDark ? "bg-[#0e1b17] border-emerald-900 text-white focus:border-emerald-500" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600"}`} placeholder="Kullanıcı adı" />
             </label>
             <label className="block">
-              <div className="mb-1 text-xs font-semibold">Şifre</div>
-              <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none" placeholder="Şifre" />
+              <div className={`mb-1 text-xs font-semibold ${themeClasses.textMuted}`}>Şifre</div>
+              <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} className={`w-full rounded-2xl border px-4 py-3 outline-none transition ${isDark ? "bg-[#0e1b17] border-emerald-900 text-white focus:border-emerald-500" : "bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600"}`} placeholder="Şifre" />
             </label>
-            <button type="submit" className="w-full rounded-2xl bg-emerald-700 py-3 font-semibold text-white hover:bg-emerald-800 transition">
+            <button type="submit" className={`w-full rounded-2xl py-3 text-center ${themeClasses.buttonPrimary}`}>
               Giriş Yap
             </button>
           </div>
@@ -804,58 +836,64 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-slate-900">
-      <div className="mx-auto max-w-[1400px] p-4 pb-24 lg:p-6">
+    <div className={`min-h-screen transition-colors duration-300 font-sans ${themeClasses.bg}`}>
+      <div className="mx-auto max-w-[1400px] p-4 pb-28 lg:p-6">
         {(state.selectedTab === "home" || state.selectedTab === "profil") && (
-          <header className="mb-4 rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
+          <header className={`mb-4 rounded-[2rem] border p-4 transition-colors ${themeClasses.cardBg} ${themeClasses.accentGlow}`}>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
-                  <Sparkles className="h-4 w-4" /> İlim Yolu
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-500">
+                    <Sparkles className="h-4 w-4" /> İlim Yolu
+                  </span>
+                  <button onClick={toggleDarkMode} className="ml-2 rounded-full bg-emerald-500/10 p-1.5 text-amber-400 hover:bg-emerald-500/20 transition" title="Karanlık Modu Değiştir">
+                    {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4 text-emerald-800" />}
+                  </button>
                 </div>
-                <h2 className="mt-1 text-2xl font-black text-emerald-950">Selam, {state.username || "misafir"}</h2>
-                <p className="text-sm text-slate-600">Bugün {todayCount}/5 namaz · Streak {prayerStreak}</p>
+                <h2 className={`mt-1 text-2xl font-black ${themeClasses.textHeading}`}>Selam, {state.username || "misafir"}</h2>
+                <p className={`text-sm ${themeClasses.textMuted}`}>Bugün {todayCount}/5 namaz · Streak {prayerStreak} Gün</p>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <MiniStat label="XP" value={state.xp} icon={Zap} />
-                <MiniStat label="Seviye" value={state.level} icon={Crown} />
-                <MiniStat label="Gems" value={state.gems} icon={Gem} />
-                <MiniStat label="Kaza" value={state.missedPrayers} icon={AlertTriangle} />
+                <MiniStat label="XP" value={state.xp} icon={Zap} isDark={isDark} />
+                <MiniStat label="Seviye" value={state.level} icon={Crown} isDark={isDark} />
+                <MiniStat label="Gems" value={state.gems} icon={Gem} isDark={isDark} />
+                <MiniStat label="Kaza" value={state.missedPrayers} icon={AlertTriangle} isDark={isDark} />
               </div>
             </div>
           </header>
         )}
 
         {celebrate && (
-          <div className="mb-4 flex items-center justify-between rounded-3xl border border-amber-200 bg-amber-50 p-4 text-amber-900 shadow-sm">
+          <div className="mb-4 flex items-center justify-between rounded-3xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-400 shadow-sm backdrop-blur">
             <div className="flex items-center gap-2 font-semibold">
-              <Trophy className="h-5 w-5 text-amber-600" /> {celebrate}
+              <Trophy className="h-5 w-5 text-amber-400" /> {celebrate}
             </div>
-            <button onClick={() => setCelebrate("")} className="text-xs text-amber-700 font-bold hover:underline">Kapat</button>
+            <button onClick={() => setCelebrate("")} className="text-xs text-amber-400 font-bold hover:underline">Kapat</button>
           </div>
         )}
 
-        {state.selectedTab === "home" && <HomeView state={state} bursaTimes={bursaTimes} todayCount={todayCount} prayerFinished={prayerFinished} prayerStreak={prayerStreak} prayerSeries={prayerSeries} markPrayer={markPrayer} markDuaRead={markDuaRead} setState={setState} />}
-        {state.selectedTab === "sureler" && <SurahView selectedSurah={selectedSurah} selectedDua={selectedDua} filteredSurahs={filteredSurahs} search={search} setSearch={setSearch} sort={state.surahSort} setSort={(v) => setState((s) => ({ ...s, surahSort: v }))} progress={state.surahProgress} statuses={state.surahStatuses} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} setSelectedDua={(id) => setState((s) => ({ ...s, selectedDua: id }))} setSurahStatus={setSurahStatus} addSurahRead={addSurahRead} activeItemType={activeItemType} setActiveItemType={setActiveItemType} />}
-        {state.selectedTab === "tesbihat" && <TesbihatView state={state} tesbihatSteps={tesbihatSteps} currentStep={currentStep} currentStepCount={currentStepCount} incTesbihatStep={incTesbihatStep} prevTesbihatStep={prevTesbihatStep} completeTesbihat={completeTesbihat} setState={setState} />}
-        {state.selectedTab === "zikir" && <ZikirView zikrData={zikrData} selectedZikr={selectedZikr} selectedZikrCount={selectedZikrCount} target={state.zikrTarget} selectZikr={selectZikr} addZikr={addZikr} resetZikr={resetZikr} counts={state.zikrCounts || {}} />}
-        {state.selectedTab === "oyun" && <GameView surah={selectedSurah} surahList={surahData} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} addXp={(val) => setState((s) => ({ ...s, xp: s.xp + val }))} />}
-        {state.selectedTab === "profil" && <ProfileView state={state} prayerStreak={prayerStreak} prayerSeries={prayerSeries} logout={logout} />}
+        {state.selectedTab === "home" && <HomeView state={state} bursaTimes={bursaTimes} todayCount={todayCount} prayerFinished={prayerFinished} prayerStreak={prayerStreak} prayerSeries={prayerSeries} markPrayer={markPrayer} markDuaRead={markDuaRead} setState={setState} theme={themeClasses} isDark={isDark} />}
+        {state.selectedTab === "sureler" && <SurahView selectedSurah={selectedSurah} selectedDua={selectedDua} filteredSurahs={filteredSurahs} search={search} setSearch={setSearch} sort={state.surahSort} setSort={(v) => setState((s) => ({ ...s, surahSort: v }))} progress={state.surahProgress} statuses={state.surahStatuses} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} setSelectedDua={(id) => setState((s) => ({ ...s, selectedDua: id }))} setSurahStatus={setSurahStatus} addSurahRead={addSurahRead} activeItemType={activeItemType} setActiveItemType={setActiveItemType} theme={themeClasses} isDark={isDark} />}
+        {state.selectedTab === "tesbihat" && <TesbihatView state={state} tesbihatSteps={tesbihatSteps} currentStep={currentStep} currentStepCount={currentStepCount} incTesbihatStep={incTesbihatStep} prevTesbihatStep={prevTesbihatStep} completeTesbihat={completeTesbihat} setState={setState} theme={themeClasses} isDark={isDark} />}
+        {state.selectedTab === "zikir" && <ZikirView zikrData={zikrData} selectedZikr={selectedZikr} selectedZikrCount={selectedZikrCount} target={state.zikrTarget} selectZikr={selectZikr} addZikr={addZikr} resetZikr={resetZikr} counts={state.zikrCounts || {}} theme={themeClasses} isDark={isDark} />}
+        {state.selectedTab === "oyun" && <GameView surah={selectedSurah} surahList={surahData} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} addXp={(val) => setState((s) => ({ ...s, xp: s.xp + val }))} theme={themeClasses} isDark={isDark} />}
+        {state.selectedTab === "profil" && <ProfileView state={state} prayerStreak={prayerStreak} prayerSeries={prayerSeries} logout={logout} theme={themeClasses} isDark={isDark} />}
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-100 bg-white/95 backdrop-blur">
+      {/* Yenilenmiş Alt Menü */}
+      <nav className={`fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-lg transition-colors ${isDark ? "bg-[#0b1311]/90 border-emerald-900/50" : "bg-white/90 border-emerald-100"}`}>
         <div className="mx-auto grid max-w-[1400px] grid-cols-6 gap-1 p-2">
           {[
             ["home", Home, "Ana Sayfa"],
             ["sureler", BookOpen, "Sureler"],
-            ["tesbihat", Layers3, "Tesbihat"],
+            ["tesbihat", Layers, "Tesbihat"],
             ["zikir", Sparkles, "Zikirmatic"],
             ["oyun", Gamepad2, "Ezber Modu"],
             ["profil", User, "Profil"],
           ].map(([key, Icon, label]) => (
-            <button key={key} onClick={() => setState((s) => ({ ...s, selectedTab: key }))} className={`flex flex-col items-center justify-center rounded-2xl py-2 text-[11px] font-semibold ${state.selectedTab === key ? "bg-emerald-700 text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+            <button key={key} onClick={() => setState((s) => ({ ...s, selectedTab: key }))} className={`flex flex-col items-center justify-center rounded-2xl py-2 text-[10px] font-semibold transition active:scale-95 ${state.selectedTab === key ? "bg-emerald-700 text-white shadow-md shadow-emerald-900/30" : isDark ? "text-emerald-400 hover:bg-emerald-900/20" : "text-slate-600 hover:bg-slate-100"}`}>
               <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-              {label}
+              <span className="mt-0.5 truncate">{label}</span>
             </button>
           ))}
         </div>
@@ -864,7 +902,7 @@ function App() {
   );
 }
 
-function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak, prayerSeries, markPrayer, markDuaRead, setState }) {
+function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak, prayerSeries, markPrayer, markDuaRead, setState, theme, isDark }) {
   const prayerCards = [
     { id: "sabah", tr: "Sabah", en: "Fajr" },
     { id: "ogle", tr: "Öğle", en: "Dhuhr" },
@@ -876,148 +914,165 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
   const todayZikrs = isToday && state.dailyLogs?.zikrs?.length ? state.dailyLogs.zikrs.join(" • ") : "Henüz kayıt yok";
   const todayDuas = isToday && state.dailyLogs?.duas?.length ? state.dailyLogs.duas.join(" • ") : "Henüz kayıt yok";
 
+  // Dairesel İlerleme Çubuğu İçin Hesaplama
+  const percentage = (todayCount / 5) * 100;
+  const strokeDashoffset = 251.2 - (251.2 * percentage) / 100;
+
   return (
     <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
         {/* Bursa Namaz Vakitleri Kartı */}
-        <section className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2 font-bold text-emerald-950">
-              <Clock className="h-5 w-5 text-emerald-700" /> Bursa Namaz Vakitleri
+        <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <div className="flex items-center justify-between border-b border-emerald-500/10 pb-3">
+            <div className="flex items-center gap-2 font-bold text-emerald-400">
+              <Clock className="h-5 w-5 text-amber-400" /> Bursa Namaz Vakitleri
             </div>
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Sabit Konum</span>
+            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Sabit Konum</span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
-            <TimeBox label="İmsak" time={bursaTimes.imsak} />
-            <TimeBox label="Güneş" time={bursaTimes.gunes} />
-            <TimeBox label="Öğle" time={bursaTimes.ogle} />
-            <TimeBox label="İkindi" time={bursaTimes.ikindi} />
-            <TimeBox label="Akşam" time={bursaTimes.aksam} />
-            <TimeBox label="Yatsı" time={bursaTimes.yatsi} />
+            <TimeBox label="İmsak" time={bursaTimes.imsak} isDark={isDark} />
+            <TimeBox label="Güneş" time={bursaTimes.gunes} isDark={isDark} />
+            <TimeBox label="Öğle" time={bursaTimes.ogle} isDark={isDark} />
+            <TimeBox label="İkindi" time={bursaTimes.ikindi} isDark={isDark} />
+            <TimeBox label="Akşam" time={bursaTimes.aksam} isDark={isDark} />
+            <TimeBox label="Yatsı" time={bursaTimes.yatsi} isDark={isDark} />
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-xl font-bold text-emerald-950">Bugünün Özeti</h3>
-              <p className="text-sm text-slate-600">Bugün okudukların ve hedeflerin burada.</p>
+        {/* Dairesel Grafikli Günün Özeti */}
+        <section className={`rounded-[2rem] border p-5 transition ${theme.cardBg}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Circular Progress Bar */}
+              <div className="relative flex items-center justify-center h-24 w-24 flex-shrink-0">
+                <svg className="h-24 w-24 transform -rotate-90">
+                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" className={isDark ? "text-emerald-950" : "text-emerald-100"} fill="transparent" />
+                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" className="text-emerald-500 transition-all duration-700 ease-out" strokeDasharray="251.2" strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
+                </svg>
+                <div className="absolute flex flex-col items-center justify-center">
+                  <span className="text-xl font-black text-amber-400">{todayCount}/5</span>
+                  <span className="text-[9px] uppercase font-bold text-emerald-400">Namaz</span>
+                </div>
+              </div>
+              <div>
+                <h3 className={`text-xl font-bold ${theme.textHeading}`}>Bugünün Özeti</h3>
+                <p className={`text-sm ${theme.textMuted}`}>Bugün okudukların ve ibadet hedeflerin.</p>
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 text-xs font-bold text-amber-400">
+                  🔥 Streak: {prayerStreak} Gün
+                </div>
+              </div>
             </div>
-            <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900">Streak {prayerStreak}</div>
           </div>
-          <div className="mt-4 h-3 rounded-full bg-slate-100 overflow-hidden">
-            <div className="h-3 rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${(todayCount / 5) * 100}%` }} />
-          </div>
-          <div className="mt-3 text-sm text-slate-600">Bugün {todayCount}/5 namaz kılındı</div>
-          <div className="mt-4 grid gap-2 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs leading-6 text-slate-700">
-              <div className="font-semibold text-emerald-800">Bugünkü zikirler</div>
-              <div className="mt-1">{todayZikrs}</div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className={`rounded-2xl border p-3.5 text-xs leading-6 ${theme.subCardBg}`}>
+              <div className="font-bold text-amber-400">Bugünkü Zikirler</div>
+              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayZikrs}</div>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs leading-6 text-slate-700">
-              <div className="font-semibold text-emerald-800">Bugünkü dualar</div>
-              <div className="mt-1">{todayDuas}</div>
-              <button onClick={() => markDuaRead(state.selectedDua)} className="mt-2 rounded-xl bg-emerald-700 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-800 transition">
-                Bu duayı okudum
+            <div className={`rounded-2xl border p-3.5 text-xs leading-6 ${theme.subCardBg}`}>
+              <div className="font-bold text-amber-400">Bugünkü Dualar</div>
+              <div className={`mt-1 truncate ${theme.textMuted}`}>{todayDuas}</div>
+              <button onClick={() => markDuaRead(state.selectedDua)} className="mt-2 rounded-xl bg-emerald-700 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-600 transition active:scale-95">
+                Bu Duayı Okudum
               </button>
             </div>
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-bold text-emerald-950">Vakit Namazları</h3>
-            <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Bugün {todayCount}/5</div>
+        <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Vakit Namazları</h3>
+            <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Bugün {todayCount}/5</div>
           </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             {prayerCards.map((p) => {
               const done = state.prayerDone[p.id];
               return (
-                <button key={p.id} onClick={() => markPrayer(p.id)} className={`rounded-3xl border p-4 text-left transition hover:-translate-y-0.5 ${done ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"}`}>
+                <button key={p.id} onClick={() => markPrayer(p.id)} className={`rounded-3xl border p-4 text-left transition active:scale-95 ${done ? (isDark ? "border-emerald-500 bg-emerald-950/40 text-emerald-200" : "border-emerald-300 bg-emerald-50 text-emerald-900") : (isDark ? "border-emerald-900/40 bg-[#0e1b17]" : "border-slate-200 bg-slate-50")}`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-slate-900">{p.tr}</div>
-                      <div className="text-xs text-slate-500">{p.en}</div>
+                      <div className="font-bold">{p.tr}</div>
+                      <div className={`text-xs ${theme.textMuted}`}>{p.en}</div>
                     </div>
-                    <CheckCircle2 className={`h-5 w-5 ${done ? "text-emerald-700" : "text-slate-300"}`} />
+                    <CheckCircle2 className={`h-5 w-5 transition-colors ${done ? "text-amber-400" : "text-emerald-900/40"}`} />
                   </div>
-                  <div className="mt-3 text-sm text-slate-600">{done ? "Kılındı" : "Kılınmadı"}</div>
+                  <div className="mt-3 text-xs font-semibold">{done ? "✓ Kılındı" : "Kılınmadı"}</div>
                 </button>
               );
             })}
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-bold text-emerald-950">Bu Gün Ne Yapayım?</h3>
-            <div className={`rounded-full px-3 py-1 text-xs font-semibold ${prayerFinished ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{prayerFinished ? "Tamamlandı" : `Eksik ${5 - todayCount}`}</div>
+        <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bugün Ne Yapayım?</h3>
+            <div className={`rounded-full px-3 py-1 text-xs font-semibold ${prayerFinished ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"}`}>{prayerFinished ? "Tamamlandı" : `Eksik ${5 - todayCount}`}</div>
           </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <QuickAction label="İhlâs Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ihlas" }))} />
-            <QuickAction label="Fâtiha Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "fatiha" }))} />
-            <QuickAction label="Ettehiyyâtü oku" desc="Dua ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedDua: "ettehiyyat" }))} />
-            <QuickAction label="Zikir çek" desc="Zikirmatic'e git" onClick={() => setState((s) => ({ ...s, selectedTab: "zikir" }))} />
+          <div className="grid gap-2 md:grid-cols-2">
+            <QuickAction label="İhlâs Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ihlas" }))} theme={theme} />
+            <QuickAction label="Fâtiha Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "fatiha" }))} theme={theme} />
+            <QuickAction label="Ettehiyyâtü oku" desc="Dua ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedDua: "ettehiyyat" }))} theme={theme} />
+            <QuickAction label="Zikir çek" desc="Zikirmatic'e git" onClick={() => setState((s) => ({ ...s, selectedTab: "zikir" }))} theme={theme} />
           </div>
         </section>
       </div>
 
       <aside className="space-y-4">
-        <section className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
-          <h3 className="text-lg font-bold text-emerald-950">Son 7 Gün Namaz Grafiği</h3>
-          <p className="text-sm text-slate-500">Tarih ve kılınan namaz sayısı.</p>
+        <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <h3 className={`text-lg font-bold ${theme.textHeading}`}>Son 7 Gün Namaz Grafiği</h3>
+          <p className={`text-xs ${theme.textMuted}`}>Tarih ve kılınan namaz sayısı.</p>
           <div className="mt-4 space-y-3">
             {prayerSeries.map((d) => {
               const max = 5;
               return (
                 <div key={d.date} className="grid grid-cols-[68px_1fr_28px] items-center gap-3">
-                  <div className="text-xs text-slate-500">{d.date.slice(5)}</div>
-                  <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-3 rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${(d.count / max) * 100}%` }} />
+                  <div className={`text-xs font-medium ${theme.textMuted}`}>{d.date.slice(5)}</div>
+                  <div className={`h-3 overflow-hidden rounded-full ${isDark ? "bg-emerald-950" : "bg-slate-100"}`}>
+                    <div className="h-3 rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${(d.count / max) * 100}%` }} />
                   </div>
-                  <div className="text-right text-xs font-semibold text-slate-700">{d.count}</div>
+                  <div className="text-right text-xs font-bold text-amber-400">{d.count}</div>
                 </div>
               );
             })}
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <h3 className="text-lg font-bold text-emerald-950">İpucu</h3>
-          <p className="mt-2 text-sm leading-7 text-slate-600">Bu bölüm gerçek verilerinizle çalışır. Namaz işaretleyince streak ve grafik anlık güncellenir; zikir ve dua kayıtları da buraya yansır.</p>
+        <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <h3 className={`text-lg font-bold ${theme.textHeading}`}>Bilgilendirme</h3>
+          <p className={`mt-2 text-xs leading-6 ${theme.textMuted}`}>Otomatik Gece Modu Bursa vakitlerine göredir. Saat Akşam namazından (20:10) sabah İmsak saatine (04:32) kadar arayüz göz yormayacak şekilde karanlık moda geçer.</p>
         </section>
       </aside>
     </div>
   );
 }
 
-function TimeBox({ label, time }) {
+function TimeBox({ label, time, isDark }) {
   return (
-    <div className="rounded-xl bg-slate-50 p-2 border border-slate-100">
-      <div className="text-[10px] text-slate-500 font-semibold uppercase">{label}</div>
-      <div className="font-bold text-emerald-900 text-sm mt-0.5">{time}</div>
+    <div className={`rounded-xl p-2 border transition ${isDark ? "bg-[#0e1b17] border-emerald-900/40" : "bg-slate-50 border-slate-100"}`}>
+      <div className="text-[10px] text-amber-400 font-bold uppercase">{label}</div>
+      <div className={`font-black text-sm mt-0.5 ${isDark ? "text-emerald-100" : "text-emerald-950"}`}>{time}</div>
     </div>
   );
 }
 
-function QuickAction({ label, desc, onClick }) {
+function QuickAction({ label, desc, onClick, theme }) {
   return (
-    <button onClick={onClick} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left hover:bg-white active:scale-[0.99] transition">
-      <div className="text-sm font-bold text-slate-900">{label}</div>
-      <div className="mt-1 text-xs text-slate-500">{desc}</div>
+    <button onClick={onClick} className={`rounded-2xl border p-3.5 text-left transition active:scale-98 ${theme.subCardBg} hover:border-emerald-500/40`}>
+      <div className={`text-sm font-bold ${theme.textHeading}`}>{label}</div>
+      <div className={`mt-0.5 text-xs ${theme.textMuted}`}>{desc}</div>
     </button>
   );
 }
 
-function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead, activeItemType, setActiveItemType }) {
+function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead, activeItemType, setActiveItemType, theme, isDark }) {
   const isSurah = activeItemType === "surah";
   const activeItem = isSurah ? selectedSurah : (duaData.find((d) => d.id === selectedDua) || duaData[0]);
 
   const activeStatus = isSurah ? (statuses[selectedSurah.id] || "not_started") : "not_started";
   const statusMeta = {
-    memorized: ["Hafızada", "bg-emerald-100 text-emerald-800"],
-    in_progress: ["Devam ediyor", "bg-amber-100 text-amber-800"],
-    not_started: ["Sıfırlandı", "bg-slate-100 text-slate-600"],
+    memorized: ["Hafızada", "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"],
+    in_progress: ["Devam ediyor", "bg-amber-500/20 text-amber-300 border border-amber-500/30"],
+    not_started: ["Sıfırlandı", "bg-slate-500/20 text-slate-300 border border-slate-500/30"],
   };
 
   const combinedMenu = [
@@ -1040,18 +1095,18 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-xl font-bold text-emerald-950">{activeItem.name}</h3>
-            <p className="text-sm text-slate-600">Aşağıdaki listeden seçim yapabilirsiniz.</p>
+            <h3 className={`text-xl font-bold ${theme.textHeading}`}>{activeItem.name}</h3>
+            <p className={`text-xs ${theme.textMuted}`}>İstediğiniz sure veya duayı listeden seçebilirsiniz.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="flex items-center gap-2 rounded-2xl border bg-slate-50 px-3 py-2 text-sm">
-              <Search className="h-4 w-4 text-slate-400" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ara..." className="min-w-0 bg-transparent outline-none" />
+            <div className={`flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm ${isDark ? "bg-[#0e1b17] border-emerald-900" : "bg-slate-50 border-slate-200"}`}>
+              <Search className="h-4 w-4 text-emerald-500" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ara..." className="min-w-0 bg-transparent outline-none text-xs" />
             </div>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-2xl border bg-white px-3 py-2 text-sm outline-none">
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className={`rounded-2xl border px-3 py-2 text-xs font-semibold outline-none ${isDark ? "bg-[#0e1b17] border-emerald-900 text-white" : "bg-white border-slate-200 text-slate-800"}`}>
               <option value="usage">Kullanım sıklığı</option>
               <option value="length">Uzunluk</option>
               <option value="alphabetical">Alfabetik</option>
@@ -1059,74 +1114,75 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
           </div>
         </div>
 
-        <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-3 sm:p-4">
-          <div className="grid gap-3 lg:grid-cols-[0.55fr_0.45fr]">
-            <div className="rounded-3xl border border-slate-200 bg-white p-4">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Arapça Metin</div>
-              <div className="mt-3 text-lg leading-10 text-slate-800 text-right font-serif" dir="rtl" style={{ lineHeight: 2.3 }}>
+        <div className="mt-4 rounded-3xl p-3 sm:p-4 bg-emerald-500/5 border border-emerald-500/10">
+          <div className="grid gap-4 lg:grid-cols-[0.55fr_0.45fr]">
+            {/* Özel Amiri Fontlu Arapça Metin Kartı */}
+            <div className={`rounded-3xl border p-5 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">Arapça Metin</div>
+              <div className="mt-3 text-xl sm:text-2xl leading-relaxed text-right font-serif tracking-wide select-none" dir="rtl" style={{ fontFamily: "'Amiri', serif", lineHeight: 2.4 }}>
                 {activeItem.arabic}
               </div>
             </div>
 
-            <div className="space-y-3 rounded-3xl bg-emerald-50 p-3 sm:p-4">
-              <div className="rounded-2xl bg-white p-3 sm:p-4">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Okunuş</div>
-                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{activeItem.translit}</div>
+            <div className="space-y-3">
+              <div className={`rounded-2xl border p-4 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Türkçe Okunuş</div>
+                <div className={`mt-2 text-sm leading-7 ${theme.textHeading}`}>{activeItem.translit}</div>
               </div>
               {activeItem.meaning && (
-                <div className="rounded-2xl bg-white p-3 sm:p-4">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Meal</div>
-                  <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{activeItem.meaning}</div>
+                <div className={`rounded-2xl border p-4 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Türkçe Meal</div>
+                  <div className={`mt-2 text-sm leading-7 ${theme.textHeading}`}>{activeItem.meaning}</div>
                 </div>
               )}
             </div>
           </div>
 
           {isSurah && (
-            <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
+            <div className={`mt-4 rounded-2xl border p-4 ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-white border-emerald-100"}`}>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Ezber Durumu</div>
-                  <div className="mt-1 text-xs text-slate-700 sm:text-sm">Durumu belirleyin</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Ezber Durumu</div>
+                  <div className={`mt-0.5 text-xs ${theme.textMuted}`}>Kendi ezber takibinizi işaretleyin.</div>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
+                <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${statusMeta[activeStatus][1]}`}>{statusMeta[activeStatus][0]}</span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-2xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800 sm:px-4 sm:text-sm">Hafızada</button>
-                <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-2xl border px-3 py-2 text-xs font-semibold hover:bg-slate-50 sm:px-4 sm:text-sm">Devam ediyor</button>
-                <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-2xl border px-3 py-2 text-xs font-semibold hover:bg-slate-50 sm:px-4 sm:text-sm">Sıfırla</button>
+                <button onClick={() => setSurahStatus(selectedSurah.id, "memorized")} className="rounded-xl bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 transition active:scale-95">Hafızada</button>
+                <button onClick={() => setSurahStatus(selectedSurah.id, "in_progress")} className="rounded-xl border border-emerald-500/30 px-3 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-500/10 transition active:scale-95">Devam ediyor</button>
+                <button onClick={() => setSurahStatus(selectedSurah.id, "not_started")} className="rounded-xl border border-slate-500/30 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:bg-slate-500/10 transition active:scale-95">Sıfırla</button>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 transition">+1 Okuma Ekle</button>
-                <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Toplam: {progress[selectedSurah.id] || 0} okuma</div>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button onClick={() => addSurahRead(selectedSurah.id)} className="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition active:scale-95">+1 Okuma Ekle</button>
+                <div className={`rounded-xl px-4 py-2 text-xs font-bold ${isDark ? "bg-emerald-950 text-emerald-300" : "bg-slate-100 text-slate-700"}`}>Toplam: {progress[selectedSurah.id] || 0} Okuma</div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-        <h4 className="text-lg font-bold text-emerald-950">Sure ve Dua Listesi</h4>
-        <p className="text-sm text-slate-500">Okumak veya durumunu değiştirmek istediğinize tıklayın.</p>
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+        <h4 className={`text-lg font-bold ${theme.textHeading}`}>Sure ve Dua Listesi</h4>
+        <p className={`text-xs ${theme.textMuted}`}>Okumak istediğiniz sure veya duaya dokunun.</p>
+        <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {combinedMenu.map((item) => {
             const isActive = item.type === activeItemType && (item.type === "surah" ? item.id === selectedSurah.id : item.id === selectedDua.id);
             const count = item.type === "surah" ? (progress[item.id] || 0) : 0;
             return (
-              <button key={`${item.type}-${item.id}`} onClick={() => openItem(item)} className={`rounded-3xl border p-3 text-left transition sm:p-4 ${isActive ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
+              <button key={`${item.type}-${item.id}`} onClick={() => openItem(item)} className={`rounded-2xl border p-3.5 text-left transition active:scale-98 ${isActive ? "border-emerald-500 bg-emerald-500/10 shadow-sm" : isDark ? "border-emerald-950 bg-[#0e1b17] hover:border-emerald-800" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-sm font-bold text-slate-900 sm:text-base">{item.label}</div>
-                    <div className="text-[11px] text-slate-500 sm:text-xs">{item.type === "surah" ? "Sure" : "Dua"}</div>
+                    <div className={`text-sm font-bold ${theme.textHeading}`}>{item.label}</div>
+                    <div className={`text-[10px] ${theme.textMuted}`}>{item.type === "surah" ? "Sure" : "Dua"}</div>
                   </div>
-                  {item.type === "surah" ? <StatusBadge status={statuses[item.id] || (count >= 33 ? "memorized" : count > 0 ? "in_progress" : "not_started")} /> : <span className="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-800">Dua</span>}
+                  {item.type === "surah" ? <StatusBadge status={statuses[item.id] || (count >= 33 ? "memorized" : count > 0 ? "in_progress" : "not_started")} /> : <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/20">Dua</span>}
                 </div>
                 {item.type === "surah" && (
                   <>
-                    <div className="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
-                      <div className="h-2 rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${Math.min(100, (count / 33) * 100)}%` }} />
+                    <div className={`mt-2.5 h-1.5 rounded-full overflow-hidden ${isDark ? "bg-emerald-950" : "bg-slate-200"}`}>
+                      <div className="h-1.5 rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${Math.min(100, (count / 33) * 100)}%` }} />
                     </div>
-                    <div className="mt-2 text-[11px] text-slate-500 sm:text-xs">Toplam: {count} okuma</div>
+                    <div className={`mt-1.5 text-[10px] font-medium ${theme.textMuted}`}>Toplam: {count} okuma</div>
                   </>
                 )}
               </button>
@@ -1138,99 +1194,100 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
   );
 }
 
-function TesbihatView({ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState }) {
+function TesbihatView({ state, tesbihatSteps, currentStep, currentStepCount, incTesbihatStep, prevTesbihatStep, completeTesbihat, setState, theme, isDark }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-      <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
-        <h3 className="text-xl font-bold text-emerald-950">Namaz Tesbihatı</h3>
-        <p className="text-sm text-slate-600">Adım adım namaz tesbihatınızı takip edin.</p>
-        <div className="mt-4 flex rounded-2xl bg-slate-100 p-1">
-          <button onClick={() => setState((s) => ({ ...s, tesbihatType: "short", tesbihatIndex: 0, tesbihatProgress: [] }))} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition ${state.tesbihatType === "short" ? "bg-white shadow" : "text-slate-600"}`}>Kısa Tesbihat</button>
-          <button onClick={() => setState((s) => ({ ...s, tesbihatType: "long", tesbihatIndex: 0, tesbihatProgress: [] }))} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition ${state.tesbihatType === "long" ? "bg-white shadow" : "text-slate-600"}`}>Uzun Tesbihat</button>
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+        <h3 className={`text-xl font-bold ${theme.textHeading}`}>Namaz Tesbihatı</h3>
+        <p className={`text-xs ${theme.textMuted}`}>Adım adım tesbihatınızı takip edin.</p>
+        <div className={`mt-4 flex rounded-2xl p-1 border ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-slate-100 border-slate-200"}`}>
+          <button onClick={() => setState((s) => ({ ...s, tesbihatType: "short", tesbihatIndex: 0, tesbihatProgress: [] }))} className={`flex-1 rounded-xl px-3 py-2 text-xs font-bold transition ${state.tesbihatType === "short" ? "bg-emerald-700 text-white shadow-md" : theme.textMuted}`}>Kısa Tesbihat</button>
+          <button onClick={() => setState((s) => ({ ...s, tesbihatType: "long", tesbihatIndex: 0, tesbihatProgress: [] }))} className={`flex-1 rounded-xl px-3 py-2 text-xs font-bold transition ${state.tesbihatType === "long" ? "bg-emerald-700 text-white shadow-md" : theme.textMuted}`}>Uzun Tesbihat</button>
         </div>
-        <div className="mt-4 rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
-          <div className="text-sm font-semibold text-emerald-900">İlerleme</div>
-          <div className="mt-2 h-3 rounded-full bg-white overflow-hidden">
-            <div className="h-3 rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${((state.tesbihatIndex + 1) / tesbihatSteps.length) * 100}%` }} />
+        <div className={`mt-4 rounded-2xl border p-4 ${theme.subCardBg}`}>
+          <div className="text-xs font-bold text-amber-400">İlerleme</div>
+          <div className={`mt-2 h-2.5 rounded-full overflow-hidden ${isDark ? "bg-emerald-950" : "bg-slate-200"}`}>
+            <div className="h-2.5 rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${((state.tesbihatIndex + 1) / tesbihatSteps.length) * 100}%` }} />
           </div>
-          <div className="mt-2 text-sm text-emerald-900">Adım {state.tesbihatIndex + 1} / {tesbihatSteps.length}</div>
+          <div className={`mt-2 text-xs font-semibold ${theme.textHeading}`}>Adım {state.tesbihatIndex + 1} / {tesbihatSteps.length}</div>
         </div>
         <div className="mt-4 flex gap-2">
-          <button onClick={prevTesbihatStep} className="flex items-center gap-2 rounded-2xl border px-4 py-2 font-semibold hover:bg-slate-50"><ChevronLeft className="h-4 w-4" /> Önceki</button>
-          <button onClick={() => setState((s) => ({ ...s, tesbihatIndex: Math.min(tesbihatSteps.length - 1, s.tesbihatIndex + 1) }))} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 px-6 py-4 text-base font-semibold text-white hover:bg-emerald-800 transition md:w-auto md:text-lg"><ChevronRight className="h-5 w-5" /> Sonraki Adım</button>
+          <button onClick={prevTesbihatStep} className={`flex items-center gap-1.5 rounded-2xl border px-4 py-2.5 text-xs font-bold transition active:scale-95 ${isDark ? "border-emerald-900 text-emerald-300 hover:bg-emerald-900/20" : "border-slate-200 text-slate-700 hover:bg-slate-50"}`}><ChevronLeft className="h-4 w-4" /> Önceki</button>
+          <button onClick={() => setState((s) => ({ ...s, tesbihatIndex: Math.min(tesbihatSteps.length - 1, s.tesbihatIndex + 1) }))} className="flex w-full items-center justify-center gap-1.5 rounded-2xl bg-emerald-700 px-6 py-3 text-xs font-bold text-white hover:bg-emerald-600 transition active:scale-95"><ChevronRight className="h-4 w-4" /> Sonraki Adım</button>
         </div>
-        <button onClick={completeTesbihat} className="mt-4 w-full rounded-2xl bg-amber-500 px-4 py-3 font-semibold text-white shadow-lg shadow-amber-100 hover:bg-amber-600 transition">Tesbihatı Tamamla</button>
+        <button onClick={completeTesbihat} className="mt-3 w-full rounded-2xl bg-amber-500 px-4 py-3 text-xs font-black text-slate-950 hover:bg-amber-400 transition active:scale-95 shadow-lg shadow-amber-500/10">Tesbihatı Tamamla</button>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="rounded-3xl bg-emerald-50 p-4">
-          <div className="text-sm font-semibold text-emerald-800">{state.tesbihatType === "short" ? "Kısa" : "Uzun"} Tesbihat · Adım {state.tesbihatIndex + 1}</div>
-          <div className="mt-2 text-2xl font-black text-emerald-950">{currentStep.label}</div>
-          <div className="mt-2 text-sm text-slate-600">{currentStep.count > 1 ? `${currentStepCount} / ${currentStep.count}` : "Bu adım tek sefer okunur."}</div>
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+        <div className={`rounded-2xl border p-4 ${theme.subCardBg}`}>
+          <div className="text-xs font-bold text-amber-400">{state.tesbihatType === "short" ? "Kısa" : "Uzun"} Tesbihat · Adım {state.tesbihatIndex + 1}</div>
+          <div className={`mt-1 text-2xl font-black ${theme.textHeading}`}>{currentStep.label}</div>
+          <div className={`mt-1 text-xs ${theme.textMuted}`}>{currentStep.count > 1 ? `${currentStepCount} / ${currentStep.count}` : "Bu adım tek sefer okunur."}</div>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4"><div className="text-xs uppercase tracking-[0.2em] text-slate-500">Okunuş</div><div className="mt-2 text-sm leading-7 text-slate-800">{currentStep.title}</div></div>
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4"><div className="text-xs uppercase tracking-[0.2em] text-slate-500">Anlam</div><div className="mt-2 text-sm leading-7 text-slate-800">{currentStep.meaning}</div></div>
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4"><div className="text-xs uppercase tracking-[0.2em] text-slate-500">Hedef</div><div className="mt-2 text-sm leading-7 text-slate-800">{currentStep.count} Kez</div></div>
+          <div className={`rounded-2xl border p-3.5 ${isDark ? "bg-[#0e1b17] border-emerald-900/40" : "bg-slate-50 border-slate-200"}`}><div className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Okunuş</div><div className={`mt-1.5 text-xs leading-6 ${theme.textHeading}`}>{currentStep.title}</div></div>
+          <div className={`rounded-2xl border p-3.5 ${isDark ? "bg-[#0e1b17] border-emerald-900/40" : "bg-slate-50 border-slate-200"}`}><div className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Anlam</div><div className={`mt-1.5 text-xs leading-6 ${theme.textHeading}`}>{currentStep.meaning}</div></div>
+          <div className={`rounded-2xl border p-3.5 ${isDark ? "bg-[#0e1b17] border-emerald-900/40" : "bg-slate-50 border-slate-200"}`}><div className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Hedef</div><div className={`mt-1.5 text-xs leading-6 ${theme.textHeading}`}>{currentStep.count} Kez</div></div>
         </div>
         {currentStep.count > 1 ? (
-          <div className="mt-4 rounded-3xl border border-emerald-100 bg-emerald-50 p-5 text-center">
-            <div className="text-4xl font-black text-emerald-700">{currentStepCount}/{currentStep.count}</div>
-            <div className="mt-2 text-sm text-slate-600">Her okumada tuşa basın.</div>
-            <button onClick={incTesbihatStep} className="mt-4 w-full rounded-2xl bg-emerald-700 px-5 py-4 text-lg font-semibold text-white hover:bg-emerald-800 active:scale-[0.99] transition">+1</button>
+          <div className="mt-4 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-center">
+            <div className="text-4xl font-black text-amber-400">{currentStepCount}/{currentStep.count}</div>
+            <div className={`mt-1 text-xs ${theme.textMuted}`}>Her okumada dokunun.</div>
+            <button onClick={incTesbihatStep} className="mt-4 w-full rounded-2xl bg-emerald-700 px-5 py-4 text-lg font-black text-white hover:bg-emerald-600 active:scale-90 transition duration-150 shadow-lg shadow-emerald-900/40">+1</button>
           </div>
         ) : (
-          <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">Sonraki adıma geçmek için üstteki butonla ilerleyebilirsiniz.</div>
+          <div className={`mt-4 rounded-2xl border p-4 text-xs ${theme.subCardBg} ${theme.textMuted}`}>Sonraki adıma geçmek için üstteki butonla ilerleyebilirsiniz.</div>
         )}
       </div>
     </div>
   );
 }
 
-function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZikr, addZikr, resetZikr, counts }) {
+function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZikr, addZikr, resetZikr, counts, theme, isDark }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h3 className="text-xl font-bold text-emerald-950">Zikirmatik</h3>
-            <p className="text-sm text-slate-600">Büyük buton, sade arayüz.</p>
+            <h3 className={`text-xl font-bold ${theme.textHeading}`}>Zikirmatik</h3>
+            <p className={`text-xs ${theme.textMuted}`}>Titreşimli büyük zikir butonu.</p>
           </div>
-          <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900">Hedef: {target}</div>
+          <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-400">Hedef: {target}</div>
         </div>
 
-        <div className="mt-4 flex flex-col items-center justify-center rounded-[2.5rem] bg-[radial-gradient(circle_at_top,_#eefaf2,_#dff3e6_60%,_#cfe9da)] p-6">
-          <div className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-900">Seçili Zikir</div>
-          <div className="mt-2 text-center text-2xl font-black text-emerald-950">{selectedZikr.name}</div>
-          <div className="mt-1 text-sm text-slate-700">{selectedZikr.translit}</div>
+        <div className={`mt-4 flex flex-col items-center justify-center rounded-[2.5rem] border p-6 transition ${isDark ? "bg-gradient-to-b from-[#0e1b17] to-[#08120f] border-emerald-900/50" : "bg-gradient-to-b from-emerald-50/50 to-emerald-100/30 border-emerald-100"}`}>
+          <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-400">Seçili Zikir</div>
+          <div className={`mt-1 text-center text-2xl font-black ${theme.textHeading}`}>{selectedZikr.name}</div>
+          <div className={`mt-0.5 text-xs ${theme.textMuted}`}>{selectedZikr.translit}</div>
 
-          <button onClick={addZikr} className="mt-6 flex h-64 w-64 items-center justify-center rounded-full border-8 border-white bg-emerald-700 text-white shadow-2xl shadow-emerald-200 transition active:scale-[0.96] sm:h-80 sm:w-80">
-            <div className="text-center">
-              <div className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-100">Dokun (Titreşimli)</div>
-              <div className="mt-2 text-6xl font-black leading-none sm:text-8xl">{selectedZikrCount}</div>
-              <div className="mt-2 text-sm font-semibold text-emerald-100 sm:text-lg">{selectedZikr.name}</div>
+          {/* Elastik Yaylanan Zikirmatik Butonu */}
+          <button onClick={addZikr} className="mt-6 flex h-64 w-64 items-center justify-center rounded-full border-8 border-emerald-500/20 bg-emerald-700 text-white shadow-2xl shadow-emerald-900/50 transition-all duration-150 active:scale-90 sm:h-80 sm:w-80 hover:bg-emerald-600">
+            <div className="text-center select-none">
+              <div className="text-[10px] font-bold uppercase tracking-[0.35em] text-emerald-200">Dokun</div>
+              <div className="mt-1 text-6xl font-black leading-none sm:text-8xl text-amber-300">{selectedZikrCount}</div>
+              <div className="mt-2 text-xs font-bold text-emerald-200">{selectedZikr.name}</div>
             </div>
           </button>
 
           <div className="mt-6 flex w-full max-w-md gap-2">
-            <button onClick={resetZikr} className="rounded-2xl border border-white/80 bg-white/70 px-4 py-3 font-semibold text-slate-800 hover:bg-white transition">Sıfırla</button>
-            <div className="flex-1 rounded-2xl bg-white/70 px-4 py-3 text-sm text-slate-700 font-semibold flex items-center justify-center">
-              Sayaç: {selectedZikrCount}
+            <button onClick={resetZikr} className={`rounded-2xl border px-4 py-3 font-semibold text-xs transition active:scale-95 ${isDark ? "bg-[#0e1b17] border-emerald-900 text-emerald-300 hover:bg-emerald-900/20" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"}`}>Sıfırla</button>
+            <div className={`flex-1 rounded-2xl border px-4 py-3 text-xs font-bold flex items-center justify-center ${theme.subCardBg} ${theme.textHeading}`}>
+              Çekilen Zikir: {selectedZikrCount}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-        <h4 className="text-lg font-bold text-emerald-950">Zikir Listesi</h4>
-        <p className="text-sm text-slate-500">Değiştirmek istediğiniz zikre dokunun.</p>
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+        <h4 className={`text-lg font-bold ${theme.textHeading}`}>Zikir Listesi</h4>
+        <p className={`text-xs ${theme.textMuted}`}>Değiştirmek istediğiniz zikre dokunun.</p>
+        <div className="mt-3 grid gap-2 md:grid-cols-2">
           {zikrData.map((z) => (
-            <button key={z.id} onClick={() => selectZikr(z.id, z.defaultTarget)} className={`rounded-3xl border p-4 text-left transition ${selectedZikr.id === z.id ? "border-emerald-500 bg-emerald-50" : "bg-slate-50 hover:bg-white"}`}>
-              <div className="font-semibold text-slate-900">{z.name}</div>
-              <div className="mt-1 text-right text-lg text-slate-800 font-serif" dir="rtl">{z.arabic}</div>
-              <div className="mt-1 text-sm text-slate-600">{z.translit}</div>
-              <div className="mt-2 text-xs font-semibold text-emerald-700">Çekilen: {counts[z.id] || 0}</div>
+            <button key={z.id} onClick={() => selectZikr(z.id, z.defaultTarget)} className={`rounded-2xl border p-3.5 text-left transition active:scale-98 ${selectedZikr.id === z.id ? "border-emerald-500 bg-emerald-500/10" : isDark ? "bg-[#0e1b17] border-emerald-950 hover:border-emerald-800" : "bg-slate-50 border-slate-200 hover:bg-white"}`}>
+              <div className={`font-bold text-sm ${theme.textHeading}`}>{z.name}</div>
+              <div className="mt-1 text-right text-lg text-emerald-400 font-serif" dir="rtl" style={{ fontFamily: "'Amiri', serif" }}>{z.arabic}</div>
+              <div className={`mt-1 text-xs ${theme.textMuted}`}>{z.translit}</div>
+              <div className="mt-1.5 text-[10px] font-bold text-amber-400">Çekilen: {counts[z.id] || 0}</div>
             </button>
           ))}
         </div>
@@ -1239,8 +1296,7 @@ function ZikirView({ zikrData, selectedZikr, selectedZikrCount, target, selectZi
   );
 }
 
-// 🎮 EZBER MODU / OYUN
-function GameView({ surah, surahList, setSelectedSurah, addXp }) {
+function GameView({ surah, surahList, setSelectedSurah, addXp, theme, isDark }) {
   const words = surah.translit.split(" ");
   const [hiddenIndices, setHiddenIndices] = useState([1, 3, 5, 8]);
 
@@ -1267,26 +1323,26 @@ function GameView({ surah, surahList, setSelectedSurah, addXp }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-xl font-bold text-emerald-950">🎮 Ezber Testi Modu</h3>
-            <p className="text-sm text-slate-600">Gizli kelimelerin üzerine basarak hafızanı test et.</p>
+            <h3 className={`text-xl font-bold ${theme.textHeading}`}>🎮 Ezber Testi Modu</h3>
+            <p className={`text-xs ${theme.textMuted}`}>Bulanık kelimelere dokunarak hafızanı test et.</p>
           </div>
-          <select value={surah.id} onChange={(e) => setSelectedSurah(e.target.value)} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold outline-none">
+          <select value={surah.id} onChange={(e) => setSelectedSurah(e.target.value)} className={`rounded-2xl border px-3 py-2 text-xs font-bold outline-none ${isDark ? "bg-[#0e1b17] border-emerald-900 text-white" : "bg-slate-50 border-slate-200 text-slate-800"}`}>
             {surahList.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
         </div>
 
-        <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-          <div className="text-xs font-bold uppercase tracking-widest text-emerald-800 mb-3">{surah.name} - Türkçe Okunuş</div>
+        <div className={`mt-4 rounded-3xl border p-5 ${theme.subCardBg}`}>
+          <div className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-3">{surah.name} - Türkçe Okunuş</div>
           <div className="flex flex-wrap gap-2 leading-8">
             {words.map((word, idx) => {
               const isHidden = hiddenIndices.includes(idx);
               return (
-                <button key={idx} onClick={() => toggleWord(idx)} className={`rounded-xl px-2.5 py-1 text-sm font-medium transition ${isHidden ? "bg-emerald-200 text-transparent blur-sm hover:blur-none select-none" : "bg-white border border-slate-200 text-slate-900 shadow-sm"}`}>
+                <button key={idx} onClick={() => toggleWord(idx)} className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition active:scale-95 ${isHidden ? "bg-emerald-500/20 text-transparent blur-sm select-none hover:blur-none border border-emerald-500/30" : isDark ? "bg-[#0e1b17] border border-emerald-900 text-emerald-100" : "bg-white border border-slate-200 text-slate-900 shadow-sm"}`}>
                   {word}
                 </button>
               );
@@ -1295,10 +1351,10 @@ function GameView({ surah, surahList, setSelectedSurah, addXp }) {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <button onClick={revealAll} className="flex items-center gap-2 rounded-2xl bg-emerald-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-emerald-800 transition">
+          <button onClick={revealAll} className="flex items-center gap-1.5 rounded-2xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-600 transition active:scale-95">
             <Eye className="h-4 w-4" /> Tümünü Göster
           </button>
-          <button onClick={hideRandom} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+          <button onClick={hideRandom} className={`flex items-center gap-1.5 rounded-2xl border px-4 py-2.5 text-xs font-bold transition active:scale-95 ${isDark ? "border-emerald-900 text-emerald-300 hover:bg-emerald-900/20" : "border-slate-200 text-slate-700 hover:bg-slate-50"}`}>
             <EyeOff className="h-4 w-4" /> Rastgele Gizle
           </button>
         </div>
@@ -1307,61 +1363,60 @@ function GameView({ surah, surahList, setSelectedSurah, addXp }) {
   );
 }
 
-function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
+function ProfileView({ state, prayerStreak, prayerSeries, logout, theme, isDark }) {
   const max = Math.max(5, ...prayerSeries.map((b) => b.count));
   const initials = state.username ? state.username.slice(0, 2).toUpperCase() : "U";
   const totalZikrs = Object.values(state.zikrCounts || {}).reduce((a, b) => a + b, 0);
 
   return (
     <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-      <div className="rounded-[2rem] border border-emerald-100 bg-white p-4 shadow-sm">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-lg font-bold text-emerald-800">
+      <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+        <div className="flex items-center gap-3 border-b border-emerald-500/10 pb-4 mb-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/30 text-lg font-black text-amber-400">
             {initials}
           </div>
           <div>
-            <h3 className="text-lg font-bold text-emerald-950">{state.username}</h3>
-            <p className="text-xs text-slate-500">Profil Bilgileri</p>
+            <h3 className={`text-lg font-bold ${theme.textHeading}`}>{state.username}</h3>
+            <p className={`text-xs ${theme.textMuted}`}>Profil ve İlerleme</p>
           </div>
         </div>
-        <div className="space-y-3">
-          <ProfileLine label="Toplam XP" value={state.xp} />
-          <ProfileLine label="Seviye" value={state.level} />
-          <ProfileLine label="Namaz Streak" value={`${prayerStreak} Gün`} />
-          <ProfileLine label="Gems" value={state.gems} />
-          <ProfileLine label="Toplam Çekilen Zikir" value={totalZikrs} />
+        <div className="space-y-2.5">
+          <ProfileLine label="Toplam XP" value={state.xp} theme={theme} />
+          <ProfileLine label="Seviye" value={state.level} theme={theme} />
+          <ProfileLine label="Namaz Streak" value={`${prayerStreak} Gün`} theme={theme} />
+          <ProfileLine label="Gems" value={state.gems} theme={theme} />
+          <ProfileLine label="Toplam Çekilen Zikir" value={totalZikrs} theme={theme} />
         </div>
         <div className="mt-6">
-          <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-600 px-4 py-3 font-semibold text-white hover:bg-rose-700 transition">
+          <button onClick={logout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-600 px-4 py-3 font-bold text-xs text-white transition active:scale-95">
             <LogOut className="h-4 w-4" /> Çıkış Yap
           </button>
         </div>
       </div>
 
       <div className="space-y-4">
-        {/* Başarımlar / Rozetler */}
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <h4 className="text-lg font-bold text-emerald-950">Başarımlar & Rozetler</h4>
-          <p className="text-sm text-slate-500 mb-3">İbadet ve ezber hedeflerine ulaştıkça açılır.</p>
+        <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <h4 className={`text-lg font-bold ${theme.textHeading}`}>Başarımlar & Rozetler</h4>
+          <p className={`text-xs ${theme.textMuted} mb-3`}>İbadet ve ezber hedeflerine ulaştıkça açılır.</p>
           <div className="grid grid-cols-2 gap-2">
-            <Badge title="🥇 İlk Adım" desc="Sisteme kayıt olundu" active={true} />
-            <Badge title="🔥 3 Günlük Seri" desc="3 Gün namaz kılındı" active={prayerStreak >= 3} />
-            <Badge title="📿 Zikir Üstadı" desc="100+ Zikir çekildi" active={totalZikrs >= 100} />
-            <Badge title="🏆 XP Avcısı" desc="100+ XP kazanıldı" active={state.xp >= 100} />
+            <Badge title="🥇 İlk Adım" desc="Sisteme kayıt olundu" active={true} theme={theme} />
+            <Badge title="🔥 3 Günlük Seri" desc="3 Gün namaz kılındı" active={prayerStreak >= 3} theme={theme} />
+            <Badge title="📿 Zikir Üstadı" desc="100+ Zikir çekildi" active={totalZikrs >= 100} theme={theme} />
+            <Badge title="🏆 XP Avcısı" desc="100+ XP kazanıldı" active={state.xp >= 100} theme={theme} />
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
-          <h4 className="text-lg font-bold text-emerald-950">Namaz Geçmişi</h4>
-          <p className="text-sm text-slate-500">Son 7 gün içindeki kılınan namaz verileri.</p>
+        <div className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
+          <h4 className={`text-lg font-bold ${theme.textHeading}`}>Namaz Geçmişi</h4>
+          <p className={`text-xs ${theme.textMuted}`}>Son 7 gün içindeki kılınan namaz verileri.</p>
           <div className="mt-4 space-y-3">
             {prayerSeries.map((b) => (
               <div key={b.date} className="grid grid-cols-[68px_1fr_28px] items-center gap-3">
-                <div className="text-xs text-slate-500">{b.date.slice(5)}</div>
-                <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-3 rounded-full bg-emerald-600 transition-all duration-300" style={{ width: `${(b.count / max) * 100}%` }} />
+                <div className={`text-xs font-medium ${theme.textMuted}`}>{b.date.slice(5)}</div>
+                <div className={`h-3 overflow-hidden rounded-full ${isDark ? "bg-emerald-950" : "bg-slate-100"}`}>
+                  <div className="h-3 rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${(b.count / max) * 100}%` }} />
                 </div>
-                <div className="text-right text-xs font-semibold text-slate-700">{b.count}</div>
+                <div className="text-right text-xs font-bold text-amber-400">{b.count}</div>
               </div>
             ))}
           </div>
@@ -1371,43 +1426,43 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout }) {
   );
 }
 
-function Badge({ title, desc, active }) {
+function Badge({ title, desc, active, theme }) {
   return (
-    <div className={`rounded-2xl border p-3 transition ${active ? "bg-emerald-50 border-emerald-300" : "bg-slate-50 opacity-40"}`}>
-      <div className="font-bold text-sm text-slate-900">{title}</div>
-      <div className="text-xs text-slate-500 mt-0.5">{desc}</div>
+    <div className={`rounded-2xl border p-3 transition ${active ? "bg-emerald-500/10 border-emerald-500/30" : "opacity-40 border-slate-500/20"}`}>
+      <div className={`font-bold text-xs ${theme.textHeading}`}>{title}</div>
+      <div className={`text-[10px] mt-0.5 ${theme.textMuted}`}>{desc}</div>
     </div>
   );
 }
 
-function MiniStat({ label, value, icon: Icon }) {
+function MiniStat({ label, value, icon: Icon, isDark }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Icon className="h-3.5 w-3.5 text-emerald-700" /> {label}
+    <div className={`rounded-2xl border px-3 py-2 text-center transition ${isDark ? "bg-[#0e1b17] border-emerald-900/60" : "bg-slate-50 border-slate-200"}`}>
+      <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-amber-400">
+        <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-1 font-bold text-slate-900">{value}</div>
+      <div className={`mt-0.5 font-black text-sm ${isDark ? "text-emerald-100" : "text-slate-900"}`}>{value}</div>
     </div>
   );
 }
 
-function ProfileLine({ label, value }) {
+function ProfileLine({ label, value, theme }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-      <span className="text-sm text-slate-600">{label}</span>
-      <span className="font-bold text-slate-900">{value}</span>
+    <div className={`flex items-center justify-between rounded-2xl border px-4 py-2.5 ${theme.subCardBg}`}>
+      <span className={`text-xs ${theme.textMuted}`}>{label}</span>
+      <span className={`font-bold text-xs ${theme.textHeading}`}>{value}</span>
     </div>
   );
 }
 
 function StatusBadge({ status }) {
   const map = {
-    memorized: ["Hafızada", "bg-emerald-100 text-emerald-800"],
-    in_progress: ["Devam ediyor", "bg-amber-100 text-amber-800"],
-    not_started: ["Sıfırlandı", "bg-slate-100 text-slate-600"],
+    memorized: ["Hafızada", "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"],
+    in_progress: ["Devam ediyor", "bg-amber-500/20 text-amber-300 border border-amber-500/30"],
+    not_started: ["Sıfırlandı", "bg-slate-500/20 text-slate-300 border border-slate-500/30"],
   };
   const [label, style] = map[status] || map.not_started;
-  return <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${style}`}>{label}</span>;
+  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${style}`}>{label}</span>;
 }
 
 export default App;
