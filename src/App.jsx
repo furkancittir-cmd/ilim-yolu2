@@ -24,7 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 
-const STORAGE_KEY = "ilim-yolu-v13";
+const STORAGE_KEY = "ilim-yolu-v14";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
@@ -387,7 +387,7 @@ const surahData = [
 فَأُمُّهُ هَاوِيَةٌ
 وَمَا أَدْرَاكَ مَا هِيَهْ
 نَارٌ حَامِيَةٌ`,
-    translit: `El kâriah. Mâl kâriah. Ve mâ edrâke mâl kâriah. Yevme yekûnün nâsu kel ferâşil mebthûş. Ve tekûnül cibâlu kel ıhnil menfûş. Fe emmâ men sekulet mevâzînüh. Fe huve fî ışıetin râdiyeh. Ve emmâ men hafvet mevâzînüh. Fe ümmühû hâviyeh. Ve mâ edrâke mâ hiyeh. Nârün hâmiyeh.`,
+    translit: `El kâriah. Mâl kâriah. Ve mâ edrâke mâl kâriah. Yevme yekûnün nâsu kel ferâşil mebthûş. Ve tekûnül cibâlu kel ıhnil menfûş. Fe emmâ men sekulet mevâzînüh. Fe huve fî ışıetin râdiyeh. Ve emmâ men hafvet mevâzînüh. Fe ümmühû hâviyeh. Ve mâ edrâke مَا hiyeh. Nârün hâmiyeh.`,
     meaning: `Kıyameti çarpan büyük felaket! Kıyametin ne olduğunu sana ne bildirdi? O gün insanlar dağılmış pervaneler gibi olur. Dağlar atılmış renkli yün gibi olur. Kimin tartıları ağır gelirse, o hoşnut bir hayat içindedir. Kimin tartıları hafif gelirse, onun varacağı yer Hâviye’dir. Hâviye’nin ne olduğunu sana ne bildirdi? Çok sıcak bir ateştir.`,
   },
   {
@@ -479,38 +479,64 @@ const surahData = [
     translit: `İkra bismi rabbikellezî halak. Halakal insâne min alak. İkra ve rabbükel ekrem. Ellezî allame bil kalem. Allamel insâne mâ lem ya'lem. Kellâ innel insâne le yattğâ. En raâhustağnâ. İnne ilâ rabbiker ruc'â. Eraeytellezî yenhâ. Abden izâ sallâ. Eraeyte in kâne alel hüdâ. Ev emera bit takvâ. Eraeyte in kezzebe ve tevellâ. Elem ya'lem bi enne'llâhe yerâ. Kellâ lein lem yentehi le nesfe'an binnâsiyeh. Nâsiyetin kâzibetin hâti'ah. Felyed'u nâdiyah. Sened'uz zebâniyah. Kellâ lâ tuti'hu vescud vakterib.`,
     meaning: `Yaratan Rabbinin adıyla oku. İnsanı alaktan yarattı. Oku! Rabbin sonsuz kerem sahibidir. Kalemle öğreten O’dur. İnsana bilmediğini öğretti. Hayır! İnsan gerçekten azgınlık eder. Kendini yeterli görünce. Şüphesiz dönüş yalnız Rabbinedir. Görmedin mi o engelleyeni; bir kulu namaz kılarken. Ya o kul doğru yolda ise? Ya da takvayı emrediyorsa? Görmedin mi yalanlayıp yüz çevireni? Allah’ın gördüğünü bilmiyor mu? Hayır, vazgeçmezse onu perçeminden yakalayacağız; yalancı, günahkâr perçemden. O zaman topluluğunu çağırsın. Biz de zebânîleri çağıracağız. Sakın ona uyma; secde et ve yaklaş.`,
   },
+];
+
+// Duaların Tam Eksiksiz Verileri
+const duaData = [
+  {
+    id: "ettehiyyat",
+    name: "Ettehiyyâtü",
+    arabic: `التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ
+السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ
+السَّلَامُ عَلَيْنَا وَعَلَىٰ عِبَادِ اللّٰهِ الصَّالِحِينَ
+أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ
+وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ`,
+    translit: `Ettehiyyâtü lillâhi vessalavâtü vettayyibât. Esselâmü aleyke eyyühen nebiyyü ve rahmetullâhi ve berakâtüh. Esselâmü aleynâ ve alâ ibâdillâhis sâlihîn. Eşhedü enlâ ilâhe illallâh. Ve eşhedü enne Muhammeden abdühû ve resûlüh.`,
+    meaning: `Bütün selamlar, ibadetler ve güzel şeyler Allah içindir. Ey Nebi, Allah’ın selamı, rahmeti ve bereketi senin üzerine olsun. Selam bizim üzerimize ve Allah’ın salih kullarının üzerine olsun. Şahitlik ederim ki Allah’tan başka ilah yoktur. Ve şahitlik ederim ki Muhammed O’nun kulu ve elçisidir.`
+  },
+  {
+    id: "salli",
+    name: "Allâhumme Salli",
+    arabic: `اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ`,
+    translit: `Allâhümme salli alâ Muhammedin ve alâ âli Muhammedin kemâ salleyte alâ İbrâhîme ve alâ âli İbrâhîma inneke hamîdün mecîd.`,
+    meaning: `Allah'ım! İbrahim'e ve İbrahim'in âline salât ettiğin gibi, Muhammed'e ve Muhammed'in âline de salât eyle. Şüphesiz Sen övülmeye layıksın, şanı yüce olansın.`
+  },
+  {
+    id: "barik",
+    name: "Allâhumme Bârik",
+    arabic: `اللّٰهُمَّ بَارِكْ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ`,
+    translit: `Allâhümme bârik alâ Muhammedin ve alâ âli Muhammedin kemâ bârakte alâ İbrâhîme ve alâ âli İbrâhîma inneke hamîdün mecîd.`,
+    meaning: `Allah'ım! İbrahim'e ve İbrahim'in âline bereket verdiğin gibi, Muhammed'e ve Muhammed'in âline de bereket ver. Şüphesiz Sen övülmeye layıksın, şanı yüce olansın.`
+  },
+  {
+    id: "rabbenaantina",
+    name: "Rabbena Âtinâ",
+    arabic: `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`,
+    translit: `Rabbenâ âtinâ fid-dünyâ haseneten ve fil-âhireti haseneten ve kınâ azâben-nâr.`,
+    meaning: `Rabbimiz! Bize dünyada da iyilik ver, ahirette de iyilik ver ve bizi cehennem azabından koru.`
+  },
+  {
+    id: "rabbenağfirli",
+    name: "Rabbenağfirli",
+    arabic: `رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ`,
+    translit: `Rabbeniğfirlî ve li-vâlideyye ve lil-mü'minîne yevme yekûmül-hisâb.`,
+    meaning: `Rabbimiz! Hesabın görüleceği günde beni, anne-babamı ve bütün müminleri bağışla.`
+  },
   {
     id: "kunut_hanefi",
     name: "Kunut Duası (Hanefî)",
-    arabicTitle: "دعاء القنوت",
-    verses: 1,
-    usage: 8,
-    status: "not_started",
-    arabic: `اللّٰهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَكْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ`,
-    translit: `Allâhümme innâ nesteînüke ve nestağfirüke ve nü'minü bike ve netevekkelu aleyke ve nüsnî aleykel hayra ve neşküruke ve lâ nekfüruke ve nahleu ve netrukü men yefcüruk.`,
-    meaning: `Allah’ım! Senden yardım isteriz, bağışlanma dileriz, Sana iman ederiz, Sana dayanırız. Sana hayır ile hamd eder, Sana şükrederiz. Sana nankörlük etmeyiz. Sana isyan edeni terk ederiz.`,
+    arabic: `اللّٰهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَكْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ
+اللّٰهُمَّ إِيَّاكَ نَعْبُدُ وَلَكَ نُصَلِّي وَنَسْجُدُ وَإِلَيْكَ نَسْعَىٰ وَنَحْفِدُ نَرْجُو رَحْمَتَكَ وَنَخْشَىٰ عَذَابَكَ إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحَقٌ`,
+    translit: `Allâhümme innâ nesteînüke ve nestağfirüke ve nü'minü bike ve netevekkelu aleyke ve nüsnî aleykel-hayra ve neşkürüke ve lâ nekfüruk, ve nahleu ve netrükü men yefcüruk. Allâhümme iyyâke na'budu ve leke nusallî ve nescüd, ve ileyke nes'â ve nahfid, nercû rahmeteke ve nahşâ azâbek, inne azâbeke bil-küffâri mulhık.`,
+    meaning: `Allah’ım! Senden yardım isteriz, bağışlanma dileriz, Sana iman ederiz, Sana dayanırız. Seni hayırla anar ve Sana şükrederiz. Sana nankörlük etmeyiz. Sana isyan edeni terk ederiz. Allah’ım! Yalnız Sana kulluk eder, Senin için namaz kılar ve secde ederiz. Sana koşar ve ibadetine istekle sarılırız. Rahmetini umar, azabından korkarız. Şüphesiz Senin azabın kâfirlere ulaşacaktır.`
   },
   {
     id: "kunut_shafii",
     name: "Kunut Duası (Şâfiî)",
-    arabicTitle: "دعاء القنوت",
-    verses: 1,
-    usage: 8,
-    status: "not_started",
-    arabic: `اللّٰهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ وَعَافِنِي فِيمَنْ عَافَيْتَ وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ وَبَارِكْ لِي فِيمَا أَعْطَيْتَ وَقِنِي شَرَّ مَا قَضَيْتَ`,
-    translit: `Allâhümmehdinî fîmen hedeyt. Ve âfinî fîmen âfeyt. Ve tevellenî fîmen tevelleyt. Ve bârik lî fîmâ a'tayt. Ve kinî şerre mâ kadayt.`,
-    meaning: `Allah’ım! Hidayet verdiklerin arasında bana da hidayet ver. Afiyet verdiklerin arasında bana da afiyet ver. Dost edindiklerin arasında beni de dost edin. Bana verdiğin şeylerde bereket ver. Hükmettiğin şeylerin şerrinden beni koru.`,
+    arabic: `اللّٰهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ وَعَافِنِي فِيمَنْ عَافَيْتَ وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ وَبَارِكْ لِي فِيمَا أَعْطَيْتَ وَقِنِي شَرَّ مَا قَضَيْتَ فَإِنَّكَ تَقْضِي وَلَا يُقْضَىٰ عَلَيْكَ وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ وَلَا يَعِزُّ مَنْ عَادَيْتَ تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ`,
+    translit: `Allâhümmehdinî fîmen hedeyt, ve âfinî fîmen âfeyt, ve tevellenî fîmen tevelleyt, ve bârik lî fîmâ a'tayt, ve kınî şerre mâ kadayt, fe-inneke takdî ve lâ yukdâ aleyk, ve innehû lâ yezillü men vâleyt, ve lâ yeizzü men âdeyt, tebârakte rabbenâ ve teâleyt.`,
+    meaning: `Allah’ım! Hidayet verdiklerin arasında bana da hidayet ver. Afiyet verdiklerinle birlikte bana da afiyet ver. Dost edindiklerinle birlikte beni de dost edin. Bana verdiğin nimetleri bereketli kıl. Hükmettiğin şeylerin şerrinden beni koru. Şüphesiz Hüküm veren Sensin, Senin üzerine hüküm verilemez. Dost edindiğin kimse rezil olmaz, düşman olduğun kimse aziz olamaz. Rabbimiz! Sen mübareksin ve yücesin.`
   },
-];
-
-const duaData = [
-  { id: "ettehiyyat", name: "Ettehiyyâtü", arabic: `التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ\nالسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ\nالسَّلَامُ عَلَيْنَا وَعَلَىٰ عِبَادِ اللّٰهِ الصَّالِحِينَ\nأَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ\nوَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ`, translit: `Ettehiyyâtü lillâhi vessalavâtü vettayyibât. Esselâmü aleyke eyyühen nebiyyü ve rahmetullâhi ve berakâtüh. Esselâmü aleynâ ve alâ ibâdillâhis sâlihîn. Eşhedü enlâ ilâhe illallâh. Ve eşhedü enne Muhammeden abdühû ve resûlüh.`, meaning: `Bütün selamlar, ibadetler ve güzel şeyler Allah içindir. Ey Nebi, Allah’ın selamı, rahmeti ve bereketi senin üzerine olsun. Selam bizim üzerimize ve Allah’ın salih kullarının üzerine olsun. Şahitlik ederim ki Allah’tan başka ilah yoktur. Ve şahitlik ederim ki Muhammed O’nun kulu ve elçisidir.` },
-  { id: "salli", name: "Allâhumme Salli", arabic: `اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ\nوَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ`, translit: `Allâhümme salli alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.`, meaning: `Allah’ım! Efendimiz Muhammed’e ve onun âline salât eyle.` },
-  { id: "barik", name: "Allâhumme Bârik", arabic: `اللّٰهُمَّ بَارِكْ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ\nوَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ`, translit: `Allâhümme bârik alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.`, meaning: `Allah’ım! Efendimiz Muhammed’e ve onun âline bereket ver.` },
-  { id: "rabbenaantina", name: "Rabbena Âtinâ", arabic: `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`, translit: `Rabbenâ âtinâ fid-dünyâ haseneten ve fil âhireti haseneten ve kınâ azâben nâr.`, meaning: `Rabbimiz! Bize dünyada iyilik, ahirette de iyilik ver ve bizi ateş azabından koru.` },
-  { id: "rabbenağfirli", name: "Rabbenağfirli", arabic: `رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ`, translit: `Rabbiğfir lî ve livâlideyye ve lil mü'minîne yevme yekûmül hisâb.`, meaning: `Rabbim! Beni, anne-babamı ve hesabın görüleceği günde bütün müminleri bağışla.` },
-  { id: "kunut_hanefi", name: "Kunut (Hanefî)", arabic: `اللّٰهُمَّ إِنَّا نَسْتَعِينُكَ...`, translit: `Allâhümme innâ nesteînüke ve nestağfirüke...`, meaning: `Allah’ım! Senden yardım ister, bağışlanma diler ve Sana dayanırız.` },
-  { id: "kunut_shafii", name: "Kunut (Şâfiî)", arabic: `اللّٰهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ...`, translit: `Allâhümmehdinî fîmen hedeyt...`, meaning: `Allah’ım! Hidayet verdiklerin arasında bana da hidayet ver.` },
 ];
 
 const zikrData = [
@@ -627,7 +653,6 @@ function App() {
     yatsi: "21:38",
   });
 
-  // Bursa Vakitlerini API'den Çekme
   useEffect(() => {
     fetchBursaPrayerTimes().then((times) => {
       if (times) {
@@ -639,7 +664,6 @@ function App() {
     });
   }, []);
 
-  // Google Fonts (Amiri Fontu Yükle)
   useEffect(() => {
     const link = document.createElement("link");
     link.href = "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap";
@@ -838,7 +862,6 @@ function App() {
   const isDark = state.isDarkMode;
   const selectedZikrCount = state.zikrCounts?.[state.zikrSelected] || 0;
 
-  // Temalı Sınıf İsimleri (Gündüz / Gece Modu)
   const themeClasses = {
     bg: isDark ? "bg-[#0b1311] text-emerald-50" : "bg-[#f4f7f4] text-slate-900",
     cardBg: isDark ? "bg-[#13221e] border-emerald-900/60 shadow-lg" : "bg-white border-emerald-100/80 shadow-sm",
@@ -881,7 +904,6 @@ function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans ${themeClasses.bg}`}>
       <div className="mx-auto max-w-[1400px] p-4 pb-28 lg:p-6">
-        {/* Sadeleştirilmiş Ana Sayfa / Profil Üst Header */}
         {(state.selectedTab === "home" || state.selectedTab === "profil") && (
           <header className={`mb-4 rounded-[2rem] border p-4 transition-colors ${themeClasses.cardBg} ${themeClasses.accentGlow}`}>
             <div className="flex items-center justify-between">
@@ -943,7 +965,6 @@ function App() {
   );
 }
 
-// Canlı Ezan Vaktine Kalan Süreyi Hesaplayan Bileşen
 function PrayerCountdown({ bursaTimes, isDark }) {
   const [timeLeft, setTimeLeft] = useState({ nextName: "", hours: "00", minutes: "00", seconds: "00" });
 
@@ -972,7 +993,6 @@ function PrayerCountdown({ bursaTimes, isDark }) {
         }
       }
 
-      // Yarının İmsak vakti
       if (!next) {
         const [h, m] = bursaTimes.imsak.split(":").map(Number);
         const tomorrow = new Date();
@@ -1023,12 +1043,11 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
   const todayDuas = isToday && state.dailyLogs?.duas?.length ? state.dailyLogs.duas.join(" • ") : "Henüz kayıt yok";
 
   const percentage = (todayCount / 5) * 100;
-  const strokeDashoffset = 251.2 - (251.2 * percentage) / 100;
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
-        {/* 1. SIRA: Bursa Namaz Vakitleri & Canlı Geri Sayım Sayacı */}
+        {/* 1. SIRA: Bursa Namaz Vakitleri & Geri Sayım */}
         <section className={`rounded-[2rem] border p-4 transition ${theme.cardBg}`}>
           <div className="flex items-center justify-between border-b border-emerald-500/10 pb-3">
             <div className="flex items-center gap-2 font-bold text-emerald-400">
@@ -1045,7 +1064,6 @@ function HomeView({ state, bursaTimes, todayCount, prayerFinished, prayerStreak,
             <TimeBox label="Yatsı" time={bursaTimes.yatsi} isDark={isDark} />
           </div>
 
-          {/* Ezan Vaktine Kalan Süre Sayacı */}
           <PrayerCountdown bursaTimes={bursaTimes} isDark={isDark} />
         </section>
 
@@ -1188,8 +1206,8 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
     { type: "dua", id: "ettehiyyat", label: "Ettehiyyâtü" },
     { type: "dua", id: "kunut_hanefi", label: "Kunut (Hanefî)" },
     { type: "dua", id: "kunut_shafii", label: "Kunut (Şâfiî)" },
-    { type: "dua", id: "salli", label: "Salli" },
-    { type: "dua", id: "barik", label: "Barik" },
+    { type: "dua", id: "salli", label: "Allâhumme Salli" },
+    { type: "dua", id: "barik", label: "Allâhumme Bârik" },
     { type: "dua", id: "rabbenaantina", label: "Rabbena Âtinâ" },
     { type: "dua", id: "rabbenağfirli", label: "Rabbenağfirli" },
   ];
@@ -1468,7 +1486,6 @@ function GameView({ surah, surahList, setSelectedSurah, addXp, theme, isDark }) 
   );
 }
 
-// XP, Seviye, Gems Detaylarının Taşındığı Yenilenmiş Profil Sayfası
 function ProfileView({ state, prayerStreak, prayerSeries, logout, theme, isDark }) {
   const max = Math.max(5, ...prayerSeries.map((b) => b.count));
   const initials = state.username ? state.username.slice(0, 2).toUpperCase() : "U";
@@ -1487,7 +1504,6 @@ function ProfileView({ state, prayerStreak, prayerSeries, logout, theme, isDark 
           </div>
         </div>
 
-        {/* Ana Sayfadan Taşınan XP, Seviye, Gems İstatistiki Kartları */}
         <div className="mb-4 grid grid-cols-2 gap-2">
           <MiniStat label="XP" value={state.xp} icon={Zap} isDark={isDark} />
           <MiniStat label="Seviye" value={state.level} icon={Crown} isDark={isDark} />
