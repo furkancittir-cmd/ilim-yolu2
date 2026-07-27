@@ -21,6 +21,8 @@ const STORAGE_KEY = "ilim-yolu-v8";
 const todayKey = () => new Date().toISOString().slice(0, 10);
 const emptyPrayer = () => ({ sabah: false, ogle: false, ikindi: false, aksam: false, yatsi: false });
 
+const AYETEL_KURSI_MEALI = "Allah ki, O'ndan başka ilah yoktur. O hayydır, kayyûmdur. Kendisine ne bir uyuklama gelir ne de bir uyku. Göklerde ve yerdekilerin hepsi O'nundur. O'nun izni olmadan katında kim şefaat edebilir? Onların önlerindekini de arkalarındakini de bilir. Onlar ise O'nun dilediği kadarından başka ilminden hiçbir şeyi kavrayamazlar. O'nun kürsüsü gökleri ve yeri kaplamıştır. Onları koruyup gözetmek O'na ağır gelmez. O çok yücedir, çok büyüktür.";
+
 const surahData = [
   {
     id: "fatiha",
@@ -551,6 +553,7 @@ function App() {
   const [loginError, setLoginError] = useState("");
   const [search, setSearch] = useState("");
   const [celebrate, setCelebrate] = useState("");
+  const [activeItemType, setActiveItemType] = useState("surah");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -686,11 +689,10 @@ function App() {
   }
 
   function currentTesbihatSteps() {
-    const ayet = surahData.find((s) => s.id === "fatiha");
     return [
       { key: "istigfar", label: "İstiğfar ve Selam", title: "Estagfirullah, estagfirullah, estagfirullah. Allahümme entes-selamü ve minkes-selam, tebarekte ya zel-celali vel-ikram.", meaning: "Allah’ım! Sen selam sahibisin, selam/esenlik ancak Sendedir. Ey celal ve ikram sahibi Rabbim, Sen ne yücesin.", count: 1 },
       ...(state.tesbihatType === "long" ? [{ key: "salavat", label: "Salavat", title: "Allâhümme salli alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.", meaning: "Peygamber Efendimize salavat.", count: 1 }] : []),
-      { key: "ayetelkursi", label: "Ayetel Kürsi", title: "Allâhu lâ ilâhe illâ hüve'l-hayyü'l-kayyûm. Lâ te'huzühû sinetün ve lâ nevm. Lehû mâ fis-semâvâti ve mâ fil ard. Menzellezî yeşfeu indehû illâ bi iznih. Ya'lemü mâ beyne eydîhim ve mâ halfehum. Ve lâ yuhîtûne bi şey'in min ilmihî illâ bimâ şâe. Vesi'a kürsiyyühüs-semâvâti vel ard. Ve lâ yeûdühû hıfzuhumâ. Ve huvel aliyyül azîm.", meaning: "Allah ki, O'ndan başka ilah yoktur. O hayydır, kayyûmdur...", count: 1 },
+      { key: "ayetelkursi", label: "Ayetel Kürsi", title: "Allâhu lâ ilâhe illâ hüve'l-hayyü'l-kayyûm. Lâ te'huzühû sinetün ve lâ nevm. Lehû mâ fis-semâvâti ve mâ fil ard. Menzellezî yeşfeu indehû illâ bi iznih. Ya'lemü mâ beyne eydîhim ve mâ halfehum. Ve lâ yuhîtûne bi şey'in min ilmihî illâ bimâ şâe. Vesi'a kürsiyyühüs-semâvâti vel ard. Ve lâ yeûdühû hıfzuhumâ. Ve huvel aliyyül azîm.", meaning: AYETEL_KURSI_MEALI, count: 1 },
       { key: "subhanallah", label: "Sübhanallah", title: "Sübhanallah", meaning: "Allah’ı bütün eksikliklerden tenzih ederim.", count: 33 },
       { key: "elhamdulillah", label: "Elhamdülillah", title: "Elhamdülillah", meaning: "Hamd Allah’a mahsustur.", count: 33 },
       { key: "allahu_ekber", label: "Allahu Ekber", title: "Allahu Ekber", meaning: "Allah en büyüktür.", count: 33 },
@@ -793,7 +795,7 @@ function App() {
         )}
 
         {state.selectedTab === "home" && <HomeView state={state} todayCount={todayCount} prayerFinished={prayerFinished} prayerStreak={prayerStreak} prayerSeries={prayerSeries} markPrayer={markPrayer} markDuaRead={markDuaRead} />}
-        {state.selectedTab === "sureler" && <SurahView selectedSurah={selectedSurah} selectedDua={selectedDua} filteredSurahs={filteredSurahs} search={search} setSearch={setSearch} sort={state.surahSort} setSort={(v) => setState((s) => ({ ...s, surahSort: v }))} progress={state.surahProgress} statuses={state.surahStatuses} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} setSelectedDua={(id) => setState((s) => ({ ...s, selectedDua: id }))} setSurahStatus={setSurahStatus} addSurahRead={addSurahRead} />}
+        {state.selectedTab === "sureler" && <SurahView selectedSurah={selectedSurah} selectedDua={selectedDua} filteredSurahs={filteredSurahs} search={search} setSearch={setSearch} sort={state.surahSort} setSort={(v) => setState((s) => ({ ...s, surahSort: v }))} progress={state.surahProgress} statuses={state.surahStatuses} setSelectedSurah={(id) => setState((s) => ({ ...s, selectedSurah: id }))} setSelectedDua={(id) => setState((s) => ({ ...s, selectedDua: id }))} setSurahStatus={setSurahStatus} addSurahRead={addSurahRead} activeItemType={activeItemType} setActiveItemType={setActiveItemType} />}
         {state.selectedTab === "tesbihat" && <TesbihatView state={state} tesbihatSteps={tesbihatSteps} currentStep={currentStep} currentStepCount={currentStepCount} incTesbihatStep={incTesbihatStep} prevTesbihatStep={prevTesbihatStep} completeTesbihat={completeTesbihat} setState={setState} />}
         {state.selectedTab === "zikir" && <ZikirView zikrData={zikrData} selectedZikr={selectedZikr} selectedZikrCount={selectedZikrCount} target={state.zikrTarget} selectZikr={selectZikr} addZikr={addZikr} resetZikr={resetZikr} counts={state.zikrCounts || {}} />}
         {state.selectedTab === "profil" && <ProfileView state={state} prayerStreak={prayerStreak} prayerSeries={prayerSeries} logout={logout} />}
@@ -892,7 +894,7 @@ function HomeView({ state, todayCount, prayerFinished, prayerStreak, prayerSerie
           </div>
           <div className="mt-3 grid gap-2 md:grid-cols-2">
             <QuickAction label="İhlâs Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "ihlas" }))} />
-            <QuickAction label="Ayetel Kürsi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "fatiha" }))} />
+            <QuickAction label="Fâtiha Suresi oku" desc="Okuma ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedSurah: "fatiha" }))} />
             <QuickAction label="Ettehiyyâtü oku" desc="Dua ekranına git" onClick={() => setState((s) => ({ ...s, selectedTab: "sureler", selectedDua: "ettehiyyat" }))} />
             <QuickAction label="Zikir çek" desc="Zikirmatic'e git" onClick={() => setState((s) => ({ ...s, selectedTab: "zikir" }))} />
           </div>
@@ -937,8 +939,11 @@ function QuickAction({ label, desc, onClick }) {
   );
 }
 
-function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead }) {
-  const activeStatus = statuses[selectedSurah.id] || "not_started";
+function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSearch, sort, setSort, progress, statuses, setSelectedSurah, setSelectedDua, setSurahStatus, addSurahRead, activeItemType, setActiveItemType }) {
+  const isSurah = activeItemType === "surah";
+  const activeItem = isSurah ? selectedSurah : (duaData.find((d) => d.id === selectedDua) || duaData[0]);
+
+  const activeStatus = isSurah ? (statuses[selectedSurah.id] || "not_started") : "not_started";
   const statusMeta = {
     memorized: ["Hafızada", "bg-emerald-100 text-emerald-800"],
     in_progress: ["Devam ediyor", "bg-amber-100 text-amber-800"],
@@ -953,12 +958,12 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
     { type: "dua", id: "kunut_shafii", label: "Kunut (Şâfiî)" },
     { type: "dua", id: "salli", label: "Salli" },
     { type: "dua", id: "barik", label: "Barik" },
-    { type: "dua", id: "rabbenaatina", label: "Rabbena Âtinâ" },
+    { type: "dua", id: "rabbenaantina", label: "Rabbena Âtinâ" },
     { type: "dua", id: "rabbenağfirli", label: "Rabbenağfirli" },
   ];
 
-  const currentDua = duaData.find((d) => d.id === selectedDua) || duaData[0];
   const openItem = (item) => {
+    setActiveItemType(item.type);
     if (item.type === "surah") setSelectedSurah(item.id);
     else setSelectedDua(item.id);
   };
@@ -968,8 +973,8 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
       <div className="rounded-[2rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-xl font-bold text-emerald-950">Sure ve Dua Okuma</h3>
-            <p className="text-sm text-slate-600">Aşağıdaki listeden seçim yaparak oku ve kaydet.</p>
+            <h3 className="text-xl font-bold text-emerald-950">{activeItem.name}</h3>
+            <p className="text-sm text-slate-600">Aşağıdaki listeden seçim yapabilirsiniz.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex items-center gap-2 rounded-2xl border bg-slate-50 px-3 py-2 text-sm">
@@ -985,27 +990,32 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
         </div>
 
         <div className="mt-4 rounded-[2rem] border border-slate-100 bg-slate-50 p-3 sm:p-4">
-          <div className="grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
+          <div className="grid gap-3 lg:grid-cols-[0.55fr_0.45fr]">
+            {/* Tekleştirilmiş Arapça Kartı */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-4">
               <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Arapça Metin</div>
-              <div className="mt-2 text-[14px] leading-8 text-slate-800 text-right font-serif" dir="rtl" style={{ lineHeight: 2.2 }}>
-                {selectedSurah.arabic}
+              <div className="mt-3 text-lg leading-10 text-slate-800 text-right font-serif" dir="rtl" style={{ lineHeight: 2.3 }}>
+                {activeItem.arabic}
               </div>
             </div>
+
+            {/* Okunuş ve Meal Kartı */}
             <div className="space-y-3 rounded-3xl bg-emerald-50 p-3 sm:p-4">
               <div className="rounded-2xl bg-white p-3 sm:p-4">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Okunuş</div>
-                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedSurah.translit}</div>
+                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{activeItem.translit}</div>
               </div>
-              <div className="rounded-2xl bg-white p-3 sm:p-4">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Meal</div>
-                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{selectedSurah.meaning}</div>
-              </div>
+              {activeItem.meaning && (
+                <div className="rounded-2xl bg-white p-3 sm:p-4">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Türkçe Meal</div>
+                  <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{activeItem.meaning}</div>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="mt-4 grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
+          {isSurah && (
+            <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Ezber Durumu</div>
@@ -1023,17 +1033,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
                 <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Toplam: {progress[selectedSurah.id] || 0} okuma</div>
               </div>
             </div>
-
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 sm:p-4">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:text-xs">Seçili Dua</div>
-              <div className="mt-2 text-base font-bold text-slate-900">{currentDua.name}</div>
-              <div className="mt-3 rounded-2xl bg-slate-50 p-3 text-right text-[13px] leading-7 font-serif sm:p-4" dir="rtl">{currentDua.arabic}</div>
-              <div className="mt-3 rounded-2xl bg-emerald-50 p-3 sm:p-4">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 sm:text-xs">Okunuş</div>
-                <div className="mt-2 text-sm leading-7 text-slate-800 sm:text-base sm:leading-8">{currentDua.translit}</div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -1042,7 +1042,7 @@ function SurahView({ selectedSurah, selectedDua, filteredSurahs, search, setSear
         <p className="text-sm text-slate-500">Okumak veya durumunu değiştirmek istediğinize tıklayın.</p>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {combinedMenu.map((item) => {
-            const isActive = item.type === "surah" ? item.id === selectedSurah.id : item.id === selectedDua.id;
+            const isActive = item.type === activeItemType && (item.type === "surah" ? item.id === selectedSurah.id : item.id === selectedDua.id);
             const count = item.type === "surah" ? (progress[item.id] || 0) : 0;
             return (
               <button key={`${item.type}-${item.id}`} onClick={() => openItem(item)} className={`rounded-3xl border p-3 text-left transition sm:p-4 ${isActive ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:bg-white"}`}>
@@ -1256,4 +1256,4 @@ function StatusBadge({ status }) {
   return <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${style}`}>{label}</span>;
 }
 
-export default App;
+export default App; 
